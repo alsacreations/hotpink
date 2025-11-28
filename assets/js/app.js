@@ -18,6 +18,7 @@ const favoritesList = document.getElementById("favorites-list");
 
 const hueSlider = document.getElementById("hue-slider");
 const specialFilterSelect = document.getElementById("special-filter");
+const filterDescription = document.getElementById("filter-description");
 
 // State
 let colorsWithHsl = [];
@@ -191,15 +192,47 @@ function renderSpecialResults(colors, filterType) {
   const title = container.querySelector("h2");
 
   const titles = {
+    historical: "Couleurs historiques 🕰️",
+    pastel: "Couleurs pastel 🍬",
+    vintage: "Couleurs vintage 📻",
+    grays: "Niveaux de gris 🐘",
     edible: "Couleurs comestibles 😋",
     plants: "Plantes & Fleurs 🌸",
     minerals: "Minéraux & Pierres 💎",
     system: "Couleurs système 🖥️",
-    shortest: "Noms les plus courts",
-    longest: "Noms les plus longs",
   };
 
-  title.textContent = titles[filterType] || "Résultats du filtre";
+  const descriptions = {
+    historical:
+      "Les 16 couleurs originales du HTML, héritées du système VGA. Ces couleurs ont été définies dès les débuts du web et sont supportées par tous les navigateurs depuis toujours.",
+    pastel:
+      "Couleurs douces et claires, parfaites pour créer des interfaces délicates et apaisantes. Idéales pour les designs minimalistes et élégants.",
+    vintage:
+      "Palette de couleurs chaudes et terreuses évoquant les années 50 à 70. Parfaites pour donner un aspect rétro et nostalgique à vos créations.",
+    grays:
+      "Toutes les nuances de gris disponibles en CSS, du noir au blanc. Essentielles pour créer des designs monochromes sophistiqués et des hiérarchies visuelles.",
+    edible:
+      "Couleurs inspirées par la nourriture et les boissons. De quoi donner faim en codant !",
+    plants:
+      "Couleurs évoquant la nature, les fleurs et les plantes. Apportez une touche végétale à vos interfaces.",
+    minerals:
+      "Couleurs inspirées par les pierres précieuses et les minéraux. Pour des designs qui brillent !",
+    system:
+      "Couleurs système qui s'adaptent automatiquement au thème de l'utilisateur (clair/sombre). Utilisez-les pour respecter les préférences d'accessibilité.",
+  };
+
+  const baseTitle = titles[filterType] || "Résultats du filtre";
+  title.textContent = `${baseTitle} (${colors.length} couleur${
+    colors.length > 1 ? "s" : ""
+  })`;
+
+  // Show description if available
+  if (descriptions[filterType]) {
+    filterDescription.textContent = descriptions[filterType];
+    filterDescription.style.display = "block";
+  } else {
+    filterDescription.style.display = "none";
+  }
 
   nearbyColorsContainer.innerHTML = "";
   if (colors.length === 0) {
@@ -223,7 +256,12 @@ function renderHueResults(colors, hue) {
   // Update title
   const container = nearbyColorsContainer.parentElement;
   const title = container.querySelector("h2");
-  title.textContent = `Couleurs proches de la teinte ${hue}°`;
+  title.textContent = `Couleurs proches de la teinte ${hue}° (${
+    colors.length
+  } couleur${colors.length > 1 ? "s" : ""})`;
+
+  // Hide description
+  filterDescription.style.display = "none";
 
   nearbyColorsContainer.innerHTML = "";
   if (colors.length === 0) {
@@ -283,6 +321,9 @@ function selectColor(color) {
   selectedColorDisplay.style.display = "";
   const container = nearbyColorsContainer.parentElement;
   container.querySelector("h2").textContent = "Couleurs proches";
+
+  // Hide description
+  filterDescription.style.display = "none";
 
   renderSelectedColor(color);
   renderNearbyColors(color);

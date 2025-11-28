@@ -1,4 +1,92 @@
 export const filterSets = {
+  historical: [
+    "aqua",
+    "black",
+    "blue",
+    "fuchsia",
+    "gray",
+    "green",
+    "lime",
+    "maroon",
+    "navy",
+    "olive",
+    "purple",
+    "red",
+    "silver",
+    "teal",
+    "white",
+    "yellow",
+  ],
+  pastel: [
+    "lavender",
+    "lavenderblush",
+    "mistyrose",
+    "lightblue",
+    "lightcyan",
+    "lightpink",
+    "lightyellow",
+    "peachpuff",
+    "papayawhip",
+    "honeydew",
+    "aliceblue",
+    "azure",
+    "beige",
+    "cornsilk",
+    "ivory",
+    "lemonchiffon",
+    "mintcream",
+    "oldlace",
+    "seashell",
+    "snow",
+    "wheat",
+    "whitesmoke",
+    "lightgoldenrodyellow",
+    "powderblue",
+    "thistle",
+    "pink",
+  ],
+  vintage: [
+    "tan",
+    "wheat",
+    "burlywood",
+    "rosybrown",
+    "peru",
+    "goldenrod",
+    "darkgoldenrod",
+    "darkkhaki",
+    "olive",
+    "olivedrab",
+    "sienna",
+    "saddlebrown",
+    "chocolate",
+    "sandybrown",
+    "khaki",
+    "palegoldenrod",
+    "indianred",
+    "darksalmon",
+    "salmon",
+  ],
+  grays: [
+    "black",
+    "dimgray",
+    "dimgrey",
+    "gray",
+    "grey",
+    "darkgray",
+    "darkgrey",
+    "silver",
+    "lightgray",
+    "lightgrey",
+    "gainsboro",
+    "whitesmoke",
+    "white",
+    "darkslategray",
+    "darkslategrey",
+    "slategray",
+    "slategrey",
+    "lightslategray",
+    "lightslategrey",
+  ],
   edible: [
     "aqua",
     "bisque",
@@ -26,16 +114,6 @@ export const filterSets = {
     "salmon",
     "tomato",
     "wheat",
-  ],
-  animals: [
-    "coral",
-    "darkkhaki", // khaki is a color, but often associated with uniforms, maybe not animal.
-    "khaki",
-    "lightcoral",
-    "lightsalmon",
-    "salmon",
-    "darksalmon",
-    "seashell", // animal-ish
   ],
   plants: [
     "cornflowerblue",
@@ -80,24 +158,17 @@ export const filterSets = {
 };
 
 export const filterFunctions = {
-  shortest: (colors) => {
-    // Find the minimum length
-    const minLen = Math.min(...colors.map((c) => c.name.length));
-    // Accept ±1 character tolerance
-    return colors.filter((c) => c.name.length <= minLen + 1);
+  historical: (colors) => {
+    return colors.filter((c) => filterSets.historical.includes(c.name));
   },
-  longest: (colors) => {
-    const maxLen = Math.max(...colors.map((c) => c.name.length));
-    // Start with tolerance of 1 and increase until we have at least 2 results
-    let tolerance = 1;
-    let results = colors.filter((c) => c.name.length >= maxLen - tolerance);
-
-    while (results.length < 2 && tolerance < maxLen) {
-      tolerance++;
-      results = colors.filter((c) => c.name.length >= maxLen - tolerance);
-    }
-
-    return results;
+  pastel: (colors) => {
+    return colors.filter((c) => filterSets.pastel.includes(c.name));
+  },
+  vintage: (colors) => {
+    return colors.filter((c) => filterSets.vintage.includes(c.name));
+  },
+  grays: (colors) => {
+    return colors.filter((c) => filterSets.grays.includes(c.name));
   },
   edible: (colors) => {
     return colors.filter((c) => filterSets.edible.includes(c.name));

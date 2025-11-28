@@ -68,6 +68,14 @@ body {
   font-size: var(--text-s);
 }
 
+.filter-description {
+  color: var(--on-surface);
+  opacity: 0.8;
+  margin-top: calc(var(--spacing-xs) * -1);
+  margin-bottom: var(--spacing-s);
+  line-height: 1.5;
+}
+
 /* Search Section */
 .search-section {
   display: grid;

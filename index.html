@@ -63,12 +63,14 @@
           >
           <select id="special-filter" class="filter-select">
             <option value="">Aucun filtre original</option>
+            <option value="historical">Couleurs historiques 🕰️</option>
+            <option value="pastel">Couleurs pastel 🍬</option>
+            <option value="vintage">Couleurs vintage 📻</option>
+            <option value="grays">Niveaux de gris 🐘</option>
             <option value="edible">Couleurs comestibles 😋</option>
             <option value="plants">Plantes & Fleurs 🌸</option>
             <option value="minerals">Minéraux & Pierres 💎</option>
             <option value="system">Couleurs système 🖥️</option>
-            <option value="shortest">Noms les plus courts</option>
-            <option value="longest">Noms les plus longs</option>
           </select>
         </div>
       </section>
@@ -85,6 +87,11 @@
           <!-- Palette -->
           <div class="palette-container" data-layout="stack">
             <h2 class="title-m">Couleurs proches</h2>
+            <p
+              id="filter-description"
+              class="filter-description text-s"
+              style="display: none"
+            ></p>
             <div
               id="nearby-colors"
               class="grid-colors"
