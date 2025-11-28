@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Color Finder</title>
+    <meta
+      name="description"
+      content="Trouvez facilement les couleurs CSS nommées, leurs variantes et créez des palettes."
+    />
+    <link rel="stylesheet" href="assets/css/app.css" />
+    <script type="module" src="assets/js/app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-wrapper" data-layout="boxed">
+      <header class="header" data-layout="stack">
+        <h1 class="title-l">CSS Colors</h1>
+      </header>
+
+      <main data-layout="stack" data-gap="xl">
+        <!-- Search Section -->
+        <section class="search-section">
+          <label for="color-search" class="visually-hidden"
+            >Rechercher une couleur</label
+          >
+          <div class="search-wrapper">
+            <input
+              type="text"
+              id="color-search"
+              class="search-input"
+              placeholder="Rechercher une couleur (ex. hotpink)..."
+              autocomplete="off"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded="false"
+              aria-controls="search-suggestions"
+            />
+            <ul
+              id="search-suggestions"
+              class="suggestions-list"
+              role="listbox"
+              hidden
+            ></ul>
+          </div>
+
+          <div class="hue-slider-wrapper" data-layout="stack" data-gap="xs">
+            <label for="hue-slider" class="text-s"
+              >Ou filtrer par teinte :</label
+            >
+            <input
+              type="range"
+              id="hue-slider"
+              min="0"
+              max="360"
+              value="0"
+              class="hue-slider"
+            />
+          </div>
+
+          <div class="filter-wrapper" data-layout="stack" data-gap="xs">
+            <label for="special-filter" class="visually-hidden"
+              >Filtres originaux :</label
+            >
+            <select id="special-filter" class="filter-select">
+              <option value="">Aucun filtre original</option>
+              <option value="edible">Couleurs comestibles 😋</option>
+              <option value="plants">Plantes & Fleurs 🌸</option>
+              <option value="minerals">Minéraux & Pierres 💎</option>
+              <option value="system">Couleurs système 🖥️</option>
+              <option value="shortest">Noms les plus courts</option>
+              <option value="longest">Noms les plus longs</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="results-section" hidden>
+          <div data-layout="stack" data-gap="l">
+            <!-- Selected Color Display -->
+            <article
+              id="selected-color-display"
+              class="selected-color-card"
+            ></article>
+
+            <!-- Palette -->
+            <div class="palette-container" data-layout="stack">
+              <h2 class="title-m">Couleurs proches</h2>
+              <div
+                id="nearby-colors"
+                class="grid-colors"
+                data-layout="autogrid"
+                data-gap="s"
+              >
+                <!-- Colors injected via JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Favorites Section -->
+        <section
+          id="favorites-section"
+          class="favorites-section"
+          data-layout="stack"
+        >
+          <h2 class="title-m">Favoris</h2>
+          <div
+            id="favorites-list"
+            class="grid-colors"
+            data-layout="autogrid"
+            data-gap="s"
+          >
+            <p class="empty-state">Aucun favori pour le moment.</p>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer" data-layout="center">
+        <p class="text-s">
+          CSS Color Finder - Un outil pour les passionnés de CSS
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
