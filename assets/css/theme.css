@@ -50,6 +50,7 @@
 
   /* Familles de police */
   --font-base: system-ui, sans-serif;
+  --font-base: Charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
   --font-mono: ui-monospace, monospace;
   --font-chicle: chicle, serif;
 
