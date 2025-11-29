@@ -158,6 +158,9 @@ export const filterSets = {
 };
 
 export const filterFunctions = {
+  "all-lightness": (colors) => {
+    return colors.filter((c) => !c.system);
+  },
   historical: (colors) => {
     return colors.filter((c) => filterSets.historical.includes(c.name));
   },

@@ -22,7 +22,7 @@
   --liquid-content: 64rem;
 }
 [data-layout*="boxed"] {
-  --boxed-max: 64rem; /* 1024px */
+  --boxed-max: 80rem;
 }
 [data-layout*="autogrid"] {
   --col-min-size: 14rem;
@@ -272,7 +272,6 @@ body {
 /* Hue Slider */
 .hue-slider-wrapper {
   width: 100%;
-  max-width: 30rem;
 }
 
 .hue-slider {

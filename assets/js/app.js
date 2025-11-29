@@ -192,6 +192,7 @@ function renderSpecialResults(colors, filterType) {
   const title = container.querySelector("h2");
 
   const titles = {
+    "all-lightness": "Toutes les couleurs (par luminosité) ☀️",
     historical: "Couleurs historiques 🕰️",
     pastel: "Couleurs pastel 🍬",
     vintage: "Couleurs vintage 📻",
@@ -203,6 +204,8 @@ function renderSpecialResults(colors, filterType) {
   };
 
   const descriptions = {
+    "all-lightness":
+      "L'ensemble des 140+ couleurs CSS nommées (hors couleurs système), triées de la plus claire à la plus sombre. Idéal pour trouver la nuance exacte de luminosité que vous recherchez.",
     historical:
       "Les 16 couleurs originelles du HTML, héritées du système VGA. Ces couleurs ont été définies dès les débuts du web et sont supportées par tous les navigateurs depuis toujours.",
     pastel:
@@ -239,6 +242,9 @@ function renderSpecialResults(colors, filterType) {
     nearbyColorsContainer.innerHTML =
       '<p class="text-subtle">Aucune couleur trouvée pour ce filtre.</p>';
   } else {
+    // Sort by lightness (descending) for better aesthetics
+    colors.sort((a, b) => b.hsl.l - a.hsl.l);
+
     colors.forEach((c) => {
       nearbyColorsContainer.appendChild(createColorCard(c));
     });
@@ -358,12 +364,6 @@ function renderSelectedColor(color) {
                 <span class="text-subtle">OKLCH</span>
                 <span class="font-mono">${oklch}</span>
             </div>
-            <div class="color-value-row">
-                 <span class="text-subtle">RGB</span>
-                 <span class="font-mono">${hexToRgb(color.hex).r}, ${
-        hexToRgb(color.hex).g
-      }, ${hexToRgb(color.hex).b}</span>
-            </div>
         `;
 
   selectedColorDisplay.innerHTML = `
@@ -378,8 +378,8 @@ function renderSelectedColor(color) {
             ${
               complementary
                 ? `
-            <div class="color-value-row" style="margin-top: var(--spacing-m); border-top: 1px solid var(--border-light); padding-top: var(--spacing-s)">
-                <span class="text-subtle">Complémentaire</span>
+            <div class="color-value-row">
+                <span class="text-subtle">Couleur complémentaire</span>
                 <div id="comp-trigger" style="display: flex; align-items: center; gap: var(--spacing-s); cursor: pointer">
                     <div style="width: 1rem; height: 1rem; background-color: ${complementary.hex}; border-radius: 50%; border: 1px solid var(--border-light)"></div>
                     <span class="font-bold underline">${complementary.name}</span>
@@ -453,6 +453,9 @@ function renderNearbyColors(targetColor) {
 
   // Take top 12 excluding self
   const nearby = sorted.filter((c) => c.name !== targetColor.name).slice(0, 12);
+
+  // Sort by lightness for better display
+  nearby.sort((a, b) => b.hsl.l - a.hsl.l);
 
   nearbyColorsContainer.innerHTML = "";
   nearby.forEach((c) => {
