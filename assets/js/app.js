@@ -228,7 +228,7 @@ function renderSpecialResults(colors, filterType) {
 
   // Show description if available
   if (descriptions[filterType]) {
-    filterDescription.textContent = descriptions[filterType];
+    filterDescription.innerHTML = descriptions[filterType];
     filterDescription.style.display = "block";
   } else {
     filterDescription.style.display = "none";
