@@ -378,7 +378,7 @@ function renderSelectedColor(color) {
         `;
 
   const a11ySection = `
-        <div class="a11y-section" data-layout="stack">
+        <div class="a11y-section" data-layout="stack" data-gap="xs">
             <div class="color-value-row">
                 <span class="text-subtle">Contraste sur Blanc</span>
                 <div class="contrast-wrapper">
