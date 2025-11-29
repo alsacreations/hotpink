@@ -196,7 +196,7 @@ body {
 }
 
 .color-info {
-  padding: var(--spacing-l);
+  padding: var(--spacing-m);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-s);
@@ -355,7 +355,6 @@ select {
   20% {
     transform: translate(-3px) rotate(1deg);
   }
-
   30% {
     transform: translateY(2px) rotate(0);
   }
@@ -387,4 +386,57 @@ select {
   100% {
     transform: translate(1px, -2px) rotate(-1deg);
   }
+}
+
+/* Copy Trigger */
+.copy-trigger {
+  cursor: pointer;
+  position: relative;
+  transition: background-color var(--transition-duration);
+}
+
+.copy-trigger:hover {
+  background-color: var(--surface-hover);
+}
+
+.copy-icon {
+  opacity: 0.5;
+  transition: opacity var(--transition-duration);
+}
+
+.copy-trigger:hover .copy-icon {
+  opacity: 1;
+}
+
+.copy-feedback {
+  /* position: absolute; */
+  /* right: 0; */
+  background-color: var(--layer-2);
+  padding-inline: 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+/* Contrast Badges */
+.badge {
+  font-size: 0.75rem;
+  padding-inline: 6px;
+  border-radius: 4px;
+}
+
+.badge-pass {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-fail {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.contrast-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }

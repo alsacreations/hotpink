@@ -337,34 +337,72 @@ function selectColor(color) {
 }
 
 function renderSelectedColor(color) {
-  const isSystem = color.system === true;
-  const textColor = isSystem ? "white" : getAccessibleTextColor(color.hex);
-  const oklch = isSystem ? "N/A" : hexToOklch(color.hex);
   const isFav = favorites.includes(color.name);
-  const complementary = !isSystem ? getComplementaryColor(color) : null;
+  const rgb = hexToRgb(color.hex);
 
-  // For system colors, show type instead of conversions
-  const colorValues = isSystem
-    ? `
-            <div class="color-value-row">
-                <span class="text-subtle">Type</span>
-                <span class="font-mono">Couleur système</span>
+  // Contrast calculations first to determine text color
+  const contrastWhite = getContrastRatio(color.hex, "#ffffff");
+  const contrastBlack = getContrastRatio(color.hex, "#000000");
+
+  // Choose the text color with the highest contrast
+  const textColor = contrastBlack > contrastWhite ? "#000000" : "#ffffff";
+
+  const oklch = hexToOklch(color.hex);
+
+  const getGrade = (ratio) => {
+    if (ratio >= 7) return "AAA";
+    if (ratio >= 4.5) return "AA";
+    return "Fail";
+  };
+
+  const gradeWhite = getGrade(contrastWhite);
+  const gradeBlack = getGrade(contrastBlack);
+
+  const colorValues = `
+            <div class="color-value-row copy-trigger" data-value="${color.hex}" role="button" tabindex="0" title="Copier la valeur HEX">
+                <span class="text-subtle" lang="en">HEX</span>
+                <div style="display: flex; align-items: center; gap: var(--spacing-xs)">
+                    <span class="font-mono value-text">${color.hex}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="copy-icon" aria-hidden="true"><path fill="currentColor" d="M8 7h11v14H8z" opacity=".3"/><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z"/></svg>
+                    <span class="copy-feedback text-s" style="display:none">Copié !</span>
+                </div>
             </div>
-            <div class="color-value-row">
-                <span class="text-subtle">Valeur CSS</span>
-                <span class="font-mono">${color.hex}</span>
-            </div>
-        `
-    : `
-            <div class="color-value-row">
-                <span class="text-subtle">HEX</span>
-                <span class="font-mono">${color.hex}</span>
-            </div>
-            <div class="color-value-row">
-                <span class="text-subtle">OKLCH</span>
-                <span class="font-mono">${oklch}</span>
+            <div class="color-value-row copy-trigger" data-value="${oklch}" role="button" tabindex="0" title="Copier la valeur OKLCH">
+                <span class="text-subtle" lang="en">OKLCH</span>
+                <div style="display: flex; align-items: center; gap: var(--spacing-xs)">
+                    <span class="font-mono value-text">${oklch}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="copy-icon" aria-hidden="true"><path fill="currentColor" d="M8 7h11v14H8z" opacity=".3"/><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z"/></svg>
+                    <span class="copy-feedback text-s" style="display:none">Copié !</span>
+                </div>
             </div>
         `;
+
+  const a11ySection = `
+        <div class="a11y-section" data-layout="stack">
+            <div class="color-value-row">
+                <span class="text-subtle">Contraste sur Blanc</span>
+                <div class="contrast-wrapper">
+                    <span class="font-mono font-bold">${contrastWhite.toFixed(
+                      2
+                    )}</span>
+                    <span class="badge ${
+                      gradeWhite === "Fail" ? "badge-fail" : "badge-pass"
+                    }" lang="en">${gradeWhite}</span>
+                </div>
+            </div>
+            <div class="color-value-row">
+                <span class="text-subtle">Contraste sur Noir</span>
+                <div class="contrast-wrapper">
+                    <span class="font-mono font-bold">${contrastBlack.toFixed(
+                      2
+                    )}</span>
+                    <span class="badge ${
+                      gradeBlack === "Fail" ? "badge-fail" : "badge-pass"
+                    }" lang="en">${gradeBlack}</span>
+                </div>
+            </div>
+        </div>
+  `;
 
   selectedColorDisplay.innerHTML = `
         <div class="color-preview-large" style="background-color: ${
@@ -374,22 +412,9 @@ function renderSelectedColor(color) {
         </div>
         <div class="color-info">
             ${colorValues}
+            ${a11ySection}
 
-            ${
-              complementary
-                ? `
-            <div class="color-value-row">
-                <span class="text-subtle">Couleur complémentaire</span>
-                <div id="comp-trigger" style="display: flex; align-items: center; gap: var(--spacing-s); cursor: pointer">
-                    <div style="width: 1rem; height: 1rem; background-color: ${complementary.hex}; border-radius: 50%; border: 1px solid var(--border-light)"></div>
-                    <span class="font-bold underline">${complementary.name}</span>
-                </div>
-            </div>
-            `
-                : ""
-            }
-
-            <button id="toggle-fav-btn" class="btn btn-outline" style="margin-top: var(--spacing-m)">
+            <button id="toggle-fav-btn" class="btn btn-outline">
                 ${isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
             </button>
         </div>
@@ -400,11 +425,29 @@ function renderSelectedColor(color) {
     renderSelectedColor(color); // Re-render to update button text
   });
 
-  if (complementary) {
-    document
-      .getElementById("comp-trigger")
-      .addEventListener("click", () => selectColor(complementary));
-  }
+  // Add copy event listeners
+  document.querySelectorAll(".copy-trigger").forEach((el) => {
+    el.addEventListener("click", async () => {
+      const value = el.dataset.value;
+      try {
+        await navigator.clipboard.writeText(value);
+        const feedback = el.querySelector(".copy-feedback");
+        feedback.style.display = "inline";
+        setTimeout(() => {
+          feedback.style.display = "none";
+        }, 2000);
+      } catch (err) {
+        console.error("Failed to copy!", err);
+      }
+    });
+    // Add keyboard support for copy
+    el.addEventListener("keydown", async (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        el.click();
+      }
+    });
+  });
 }
 
 function getComplementaryColor(targetColor) {
@@ -475,6 +518,24 @@ function getColorDistance(c1, c2) {
       Math.pow(c1.hsl.s - c2.hsl.s, 2) +
       Math.pow(c1.hsl.l - c2.hsl.l, 2)
   );
+}
+
+function getLuminance(r, g, b) {
+  const a = [r, g, b].map((v) => {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+}
+
+function getContrastRatio(hex1, hex2) {
+  const rgb1 = hexToRgb(hex1);
+  const rgb2 = hexToRgb(hex2);
+  const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
+  const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
+  const brightest = Math.max(lum1, lum2);
+  const darkest = Math.min(lum1, lum2);
+  return (brightest + 0.05) / (darkest + 0.05);
 }
 
 function createColorCard(color) {
