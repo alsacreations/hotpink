@@ -436,6 +436,10 @@ select {
   --button-text-color: var(--on-surface);
 }
 
+.empty-state {
+  grid-column: span 2;
+}
+
 /* Palette Cards */
 .grid-palettes {
   padding-top: var(--spacing-s);
