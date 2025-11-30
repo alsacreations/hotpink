@@ -441,6 +441,7 @@ select {
 [id="quiz-btn"] {
   --button-border-color: transparent;
   --button-background-color: var(--color-gray-200);
+  --button-background-color-hover: var(--accent);
   --button-text-color: var(--surface);
 
   padding: var(--spacing-8) var(--spacing-12);
@@ -448,6 +449,13 @@ select {
   position: absolute;
   right: 0;
   bottom: calc(-1 * var(--spacing-s));
+  transition-property: transform, scale, background-color;
+  transition-timing-function: cubic-bezier(0, 2.07, 0.57, 1.41);
+
+  &:hover,
+  &:focus-visible {
+    scale: 1.05;
+  }
 }
 
 .btn-cta {
