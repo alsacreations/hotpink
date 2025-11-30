@@ -1,7 +1,13 @@
 export const palettes = [
   {
     name: "Hotpink",
-    colors: ["lightgray", "lavenderblush", "pink", "hotpink", "deeppink"],
+    colors: [
+      "lightgray",
+      "lavenderblush",
+      "pink",
+      "hotpink",
+      "mediumvioletred",
+    ],
   },
   {
     name: "Kiwi",
