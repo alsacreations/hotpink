@@ -98,7 +98,7 @@ body {
 
 .title-m {
   font-size: var(--text-xl);
-  font-weight: var(--font-weight-regular @);
+  font-weight: var(--font-weight-regular);
 }
 
 .title-s {
