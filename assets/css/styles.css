@@ -424,7 +424,7 @@ select {
   --button-text-color: var(--surface);
 
   padding: var(--spacing-8) var(--spacing-12);
-  border-radius: 0% 20% 20% 20% / 20% 40% 40% 40%;
+  /* border-radius: 0% 20% 20% 20% / 20% 40% 40% 40%; */
   position: absolute;
   right: 0;
   bottom: calc(-1 * var(--spacing-s));
