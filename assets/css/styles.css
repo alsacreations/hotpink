@@ -98,8 +98,7 @@ body {
 
 .title-m {
   font-size: var(--text-xl);
-  font-weight: var(--font-weight-semibold);
-  /* margin-bottom: var(--spacing-s); */
+  font-weight: var(--font-weight-regular @);
 }
 
 .title-s {
