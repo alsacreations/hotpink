@@ -12,6 +12,10 @@
   src: url("../fonts/chicle-v27-latin-regular.woff2") format("woff2");
 }
 
+*::selection {
+  background: var(--selection);
+}
+
 /* Modificateurs */
 [data-layout*="liquid"] {
   --liquid-content: 64rem;
@@ -479,7 +483,7 @@ select {
 
 /* Palette Cards */
 .grid-palettes {
-  padding-top: var(--spacing-s);
+  padding-block: var(--spacing-s);
 }
 .palette-card {
   display: flex;
@@ -489,7 +493,7 @@ select {
   overflow: hidden;
   transition: translate var(--transition-duration);
   cursor: pointer;
-  background-color: var(--surface);
+  background-color: var(--form-control-background);
 }
 
 .palette-card:hover,

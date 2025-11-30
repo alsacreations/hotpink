@@ -65,7 +65,7 @@
   --text-xl: clamp(var(--text-20), 0.957rem + 1.3043vw, var(--text-32));
   --text-2xl: clamp(var(--text-24), 1.2065rem + 1.3043vw, var(--text-36));
   --text-3xl: clamp(var(--text-32), 1.609rem + 1.7391vw, var(--text-48));
-  --text-4xl: clamp(var(--text-48), 2.1818rem + 3.6364vw, var(--text-80));
+  --text-4xl: clamp(var(--text-64), 3.609rem + 1.7391vw, var(--text-80));
 
   /* Hauteurs de lignes */
   --line-height-s: clamp(
