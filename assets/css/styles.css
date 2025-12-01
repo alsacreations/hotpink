@@ -286,7 +286,7 @@ body {
 
 .hue-slider {
   --range-track-color: transparent;
-  --range-thumb-border-width: 4px;
+  --range-thumb-border-width: 0px;
   --range-track-height: 1px;
   --range-thumb-size: 1rem;
   --range-thumb-border-color: var(--surface);
@@ -311,9 +311,15 @@ body {
 
 [type="range"]::-webkit-slider-thumb {
   scale: 1.5;
+  box-shadow: 0px 0px 0px 2px var(--primary-lighten) inset,
+    0px 0px 0px 4px var(--primary) inset,
+    0px 0px 0px 6px var(--primary-darken) inset;
 }
 [type="range"]::-moz-range-thumb {
   scale: 1.5;
+  box-shadow: 0px 0px 0px 2px var(--primary-lighten) inset,
+    0px 0px 0px 4px var(--primary) inset,
+    0px 0px 0px 6px var(--primary-darken) inset;
 }
 
 select {
