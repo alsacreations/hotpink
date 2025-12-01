@@ -8,6 +8,7 @@ import {
 import { filterFunctions } from "./modules/filters.js";
 import { ColorQuiz } from "./modules/quiz.js";
 import { palettes } from "./modules/palettes.js";
+import { getColorFunFact } from "./modules/funfacts.js";
 
 // DOM Elements
 const searchInput = document.getElementById("color-search");
@@ -421,6 +422,7 @@ function renderSelectedColor(color) {
             <h2 class="title-l color-preview-title">${color.name}</h2>
         </div>
         <div class="color-info">
+            <p class="color-funfact">${getColorFunFact(color.name)}</p>
             ${colorValues}
             ${a11ySection}
 

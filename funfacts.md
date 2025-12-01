@@ -1,0 +1,24 @@
+# Named colors fun facts
+
+- `orange` est la 17e couleur nommée, elle est la seule à avoir été introduite en CSS2.1
+- `***` compte parmi les 16 premières couleurs nommées en HTML 4.01 (1999)
+- `darkgray`/`darkgrey` est plus claire que `gray`/`grey` !
+- `gray`/`grey` est plus sombre que `darkgray`/`darkgrey` !
+- `*gray` et `*grey` sont absolument identiques
+- `fuchsia` est la couleur la plus souvent mal orthographiée
+- `lightgoldenrodyellow` est le nom de couleur le plus long de tous (20 caractères)
+- `rebeccapurple` a été nommé en hommage à la fille de Eric Meyer, grand contributeur de CSS
+- `cyan` et `aqua` sont absolument identiques (`#00ffff`)
+- `magenta` et `fuchsia` sont absolument identiques (`#ff00ff`)
+- `brown` est plus rouge que brun
+- `black` et `white` sont les deux couleurs les plus simples et les plus utilisées, avec les codes hexadécimaux extrêmes : `#000000` et `#FFFFFF`
+- `lime` correspond au vert pur dans le modèle de couleur RVB (`#00FF00`), tandis que la couleur nommée `green` est en fait un vert plus sombre (`#008000`)
+- `darkslategray`/`darkslategrey` est une couleur qui, malgré son nom, est souvent décrite comme un vert très foncé plutôt qu'un gris-bleu foncé
+- `dimgray`/`dimgrey` est la plus sombre de toutes les variations de gris avec le préfixe de luminance (elle est plus sombre que `gray`/`grey`)
+- `hotpink` est en toute objectivité le nom de couleur le plus original ou mémorable
+- `navajowhite` a été nommée d'après la couleur de fond du drapeau de la Nation Navajo
+- `***` compte dans notre sélection de couleurs "comestibles"
+- `***` compte dans notre sélection de couleurs "plantes et fleurs"
+- `***` compte dans notre sélection de couleurs "minéraux et pierres"
+- `***` compte dans notre sélection de couleurs "pastels"
+- `***` compte dans notre sélection de couleurs "vintage"
