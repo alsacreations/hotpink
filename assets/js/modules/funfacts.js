@@ -135,21 +135,27 @@ export const historicalColors = [
  */
 export function getColorFunFact(colorName) {
   const name = colorName.toLowerCase();
+  const capitalizedName =
+    colorName.charAt(0).toUpperCase() + colorName.slice(1);
 
-  // Check for specific fun facts
-  if (specificFunFacts[name]) {
+  const isHistorical = historicalColors.includes(name);
+  const hasSpecificFact = specificFunFacts[name];
+
+  // If both historical and has specific fact, combine them
+  if (isHistorical && hasSpecificFact) {
+    return `${specificFunFacts[name]} <strong>${capitalizedName}</strong> compte également parmi les 16 premières couleurs nommées en HTML 4.01 (1999).`;
+  }
+
+  // If only has specific fun fact
+  if (hasSpecificFact) {
     return specificFunFacts[name];
   }
 
-  // Check if it's a historical color
-  if (historicalColors.includes(name)) {
-    return `<strong>${
-      colorName.charAt(0).toUpperCase() + colorName.slice(1)
-    }</strong> compte parmi les 16 premières couleurs nommées en HTML 4.01 (1999).`;
+  // If only historical
+  if (isHistorical) {
+    return `<strong>${capitalizedName}</strong> compte parmi les 16 premières couleurs nommées en HTML 4.01 (1999).`;
   }
 
   // Default message for CSS 3 colors
-  return `<strong>${
-    colorName.charAt(0).toUpperCase() + colorName.slice(1)
-  }</strong> fait partie de la liste des couleurs nommées étendues, ajoutée en CSS 3 (2011).`;
+  return `<strong>${capitalizedName}</strong> fait partie de la liste des couleurs nommées étendues, ajoutée en CSS 3 (2011).`;
 }
