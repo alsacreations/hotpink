@@ -532,11 +532,14 @@ function renderNearbyColors(targetColor) {
   // We want colors that "look" close.
   // Let's try sorting by Hue distance first.
 
-  const sorted = [...colorsWithHsl].sort((a, b) => {
-    const distA = getColorDistance(targetColor, a);
-    const distB = getColorDistance(targetColor, b);
-    return distA - distB;
-  });
+  const sorted = [...colorsWithHsl]
+    // Exclude system colors
+    .filter((c) => !c.system)
+    .sort((a, b) => {
+      const distA = getColorDistance(targetColor, a);
+      const distB = getColorDistance(targetColor, b);
+      return distA - distB;
+    });
 
   // Take top 12 excluding self
   const nearby = sorted.filter((c) => c.name !== targetColor.name).slice(0, 12);
@@ -552,11 +555,28 @@ function renderNearbyColors(targetColor) {
 }
 
 function getColorDistance(c1, c2) {
+  // For grays (low saturation), ignore hue and focus on lightness
+  const isGray1 = c1.hsl.s < 10;
+  const isGray2 = c2.hsl.s < 10;
+
+  // If both are grays, only compare saturation and lightness
+  if (isGray1 && isGray2) {
+    return Math.sqrt(
+      Math.pow(c1.hsl.s - c2.hsl.s, 2) + Math.pow(c1.hsl.l - c2.hsl.l, 2)
+    );
+  }
+
+  // If one is gray and the other isn't, they're far apart
+  if (isGray1 !== isGray2) {
+    return 1000; // Large distance to separate grays from colors
+  }
+
+  // For colored items, use hue, saturation, and lightness
   // Hue is circular (0-360)
   let hDiff = Math.abs(c1.hsl.h - c2.hsl.h);
   if (hDiff > 180) hDiff = 360 - hDiff;
 
-  // Weight hue more heavily
+  // Weight hue more heavily for colored items
   return Math.sqrt(
     Math.pow(hDiff * 2, 2) +
       Math.pow(c1.hsl.s - c2.hsl.s, 2) +
