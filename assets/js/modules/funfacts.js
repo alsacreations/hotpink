@@ -6,11 +6,11 @@ export const specificFunFacts = {
     "<strong>Orange</strong> est la 17e couleur nommée, elle est la seule à avoir été introduite en CSS 2.1.",
   red: "<strong>Red</strong> est l'un des noms de couleurs les plus courts (3 caractères).",
   darkgray:
-    "<strong>Darkgray</strong> est plus claire que <code>gray</code>\u202f!",
+    "<strong>Darkgray</strong> est plus claire que <code>gray</code> en raison des conventions incohérentes de la liste X11 des années 1980.",
   darkgrey:
-    "<strong>Darkgrey</strong> est plus claire que <code>grey</code>\u202f!",
-  gray: "<strong>Gray</strong> est plus sombre que <code>darkgray</code>\u202f!",
-  grey: "<strong>Grey</strong> est plus sombre que <code>darkgrey</code>\u202f!",
+    "<strong>Darkgrey</strong> est plus claire que <code>grey</code> en raison des conventions incohérentes de la liste X11 des années 1980.",
+  gray: "<strong>Gray</strong> est plus sombre que <code>darkgray</code> en raison des conventions incohérentes de la liste X11 des années 1980.",
+  grey: "<strong>Grey</strong> est plus sombre que <code>darkgrey</code> en raison des conventions incohérentes de la liste X11 des années 1980.",
   khaki:
     '<strong>Khaki</strong> vient du mot ourdou et persan pour "poussiéreux" ou "couleur de la terre".',
   indigo:
