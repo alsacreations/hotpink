@@ -33,18 +33,28 @@ export const specificFunFacts = {
     "<strong>Beige</strong> est un mot français qui fait référence à la laine naturelle qui n'a pas été teinte. C'est l'un des rares noms de couleur dans la liste étendue à venir directement du français.",
   cornflowerblue:
     "<strong>Cornflowerblue</strong> vient de la fleur de bleuet (en anglais, cornflower). Il est historiquement célèbre pour avoir été la couleur de fond par défaut de l'interface utilisateur de l'outil de développement Visual Studio de Microsoft dans les années 1990 et 2000.",
+  cornsilk:
+    "<strong>Cornsilk</strong> est une couleur nommée qui dérive de la teinte des poils doux et brillants trouvés à l'extrémité de l'épi de maïs (la soie de maïs). C'est un jaune très pâle et chaleureux, qui évoque la douceur et l'agriculture.",
   dodgerblue:
     "<strong>Dodgerblue</strong> est célèbre pour avoir été utilisée comme la couleur du logo de l'équipe de baseball des Los Angeles Dodgers (anciennement les Brooklyn Dodgers).",
   fuchsia:
     "<strong>Fuchsia</strong> et <code>magenta</code> sont absolument identiques (<code>#ff00ff</code>). La première était très utilisée dans les palettes VGA de Microsoft et de Windows, et la seconde dans l'industrie en général (modèle CMJN). Les deux couleurs ont été conservées pour garantir l'accès à cette couleur.",
   lightgoldenrodyellow:
     "<strong>Lightgoldenrodyellow</strong> est le nom de couleur le plus long de tous (20 caractères).",
+  violet:
+    "<strong>Violet</strong> est une couleur nommée qui, dans la tradition des couleurs du spectre de Newton, est le dernier ton visible de la lumière avant l'ultraviolet. Dans l'art, le violet a historiquement symbolisé la pénitence et la royauté (car la teinture était rare et chère), bien que la couleur web nommée soit plus vive que le violet ecclésiastique.",
+  antiquewhite:
+    '<strong>Antiquewhite</strong> est une couleur nommée qui évoque la teinte des vieux tissus de lin ou de coton qui ont jauni naturellement avec le temps, le rendant plus chaleureux et doux. C\'est un blanc casséqui est largement utilisé en design pour donner un aspect "vintage" ou classique.',
   rebeccapurple:
     "<strong>Rebeccapurple</strong> a été ajoutée à la spécification CSS Color Level 4 pour rendre hommage à la fille décédée d'Eric Meyer, un éminent contributeur au développement du CSS. C'est le seul nom de couleur à avoir été introduit dans le but d'être un mémorial permanent dans la spécification technique.",
   cyan: "<strong>Cyan</strong> et <code>aqua</code> sont absolument identiques (<code>#00ffff</code>). La première correspond au modèle CMJN de l'industrie de l'imprimerie, tandis que la seconde était le nom préféré dans la palette de couleurs des systèmes VGA et des premières versions de Microsoft Windows.",
   aqua: "<strong>Aqua</strong> et <code>cyan</code> sont absolument identiques (<code>#00ffff</code>). La première était le nom préféré dans la palette de couleurs des systèmes VGA et des premières versions de Microsoft Windows, tandis que la seconde était nécessaire pour maintenir la cohérence avec le modèle CMJN de l'industrie de l'imprimerie.",
   magenta:
     "<strong>Magenta</strong> et <code>fuchsia</code> sont absolument identiques (<code>#ff00ff</code>). La première était très utilisée dans l'industrie en général (modèle CMJN), et la seconde dans les palettes VGA de Microsoft et de Windows. Les deux couleurs ont été conservées pour garantir l'accès à cette couleur.",
+  floralwhite:
+    "<strong>Floralwhite</strong> est une couleur nommée qui évoque la teinte délicate des pétales de fleurs blanches fraîches, ou parfois le fond d'une porcelaine décorée de motifs floraux. C'est un blanc cassé très chaud, souvent utilisé pour les arrière-plans doux et légers.",
+  lavenderblush:
+    "<strong>Lavenderblush</strong> est une couleur nommée qui combine le parfum et la délicatesse de la lavande avec le terme blush (rougeur), faisant référence à la légère rougeur des joues. C'est un blanc cassé avec une nuance de rose extrêmement subtile, souvent associé à la beauté féminine et aux cosmétiques.",
   brown: "<strong>Brown</strong> est plus rouge que brun.",
   black:
     "<strong>Black</strong> et <code>white</code> sont les couleurs fondamentales des systèmes informatiques. Leur utilisation est intrinsèquement liée à la programmation binaire : <code>black</code> représente l'absence de signal lumineux, et <code>white</code> représente l'intensité maximale pour les trois canaux RVB.",
@@ -70,6 +80,8 @@ export const specificFunFacts = {
   olivedrab:
     '<strong>Olivedrab</strong> est la seule couleur nommée à utiliser le suffixe "drab" (qui signifie "terne" ou "grisâtre", dérivé du mot français drap pour désigner un tissu de laine brute non teint). Toutes les autres variations utilisent "dark", "light", "pale", "medium" ou "deep".',
   plum: "<strong>Plum</strong> a été nommée d'après la couleur du fruit du prunier (la prune). Elle fait référence à la teinte violet-rose foncé et riche de la peau de certaines variétés de prunes mûres.",
+  deeppink:
+    "<strong>Deeppink</strong> est une couleur nommée qui est très saturée et proche du <code>magenta</code>, mais qui est plus précisément associée à la mode contemporaine (comme le <code>fuchsia</code>). Contrairement à <code>hotpink</code> qui a un côté néon, <code>deeppink</code> est riche et vibrante, souvent utilisée pour symboliser la jeunesse et l'énergie.",
   sienna:
     "<strong>Sienna</strong> est une couleur nommée qui fait référence à la couleur de la terre de Sienne, un pigment d'argile naturelle riche en oxyde de fer, originaire de la région de Sienne en Toscane, en Italie. Son nom est donc un toponyme lié à un pigment naturel.",
   tomato:
