@@ -310,16 +310,14 @@ body {
 }
 
 [type="range"]::-webkit-slider-thumb {
-  scale: 1.5;
-  box-shadow: 0px 0px 0px 2px var(--primary-lighten) inset,
-    0px 0px 0px 4px var(--primary) inset,
-    0px 0px 0px 6px var(--primary-darken) inset;
+  scale: 1.4;
+  box-shadow: 0px 0px 0px 3px var(--primary) inset,
+    0px 0px 0px 10px var(--color-white) inset;
 }
 [type="range"]::-moz-range-thumb {
-  scale: 1.5;
-  box-shadow: 0px 0px 0px 2px var(--primary-lighten) inset,
-    0px 0px 0px 4px var(--primary) inset,
-    0px 0px 0px 6px var(--primary-darken) inset;
+  scale: 1.4;
+  box-shadow: 0px 0px 0px 3px var(--primary) inset,
+    0px 0px 0px 10px var(--color-white) inset;
 }
 
 select {
