@@ -62,11 +62,13 @@ export const specificFunFacts = {
   dimgrey:
     "<strong>Dimgrey</strong> est la plus sombre de toutes les variations de gris avec le préfixe de luminance (elle est plus sombre que <code>grey</code>).",
   hotpink:
-    "<strong>Hotpink</strong> est en toute objectivité le nom de couleur le plus original ou mémorable.",
+    "<strong>Hotpink</strong> est en toute objectivité la plus belle couleur de toutes. Cette couleurest culturellement liée à la créatrice de mode Elsa Schiaparelli. Dans les années 1930, elle a lancé le « Shocking Pink », une couleur considérée comme agressive et provocante pour l'époque, qui est devenue sa signature. Le hotpink du web est l'héritier numérique de cette audace féministe et artistique.",
   navajowhite:
     "<strong>Navajowhite</strong> a été nommée d'après la couleur de fond du drapeau de la Nation Navajo.",
   olive:
     "<strong>Olive</strong> a été nommée d'après la couleur du fruit de l'olivier (avant maturation complète ou après préparation), un brun-vert terne.",
+  olivedrab:
+    '<strong>Olivedrab</strong> est la seule couleur nommée à utiliser le suffixe "drab" (qui signifie "terne" ou "grisâtre", dérivé du mot français drap pour désigner un tissu de laine brute non teint). Toutes les autres variations utilisent "dark", "light", "pale", "medium" ou "deep".',
   plum: "<strong>Plum</strong> a été nommée d'après la couleur du fruit du prunier (la prune). Elle fait référence à la teinte violet-rose foncé et riche de la peau de certaines variétés de prunes mûres.",
   sienna:
     "<strong>Sienna</strong> est une couleur nommée qui fait référence à la couleur de la terre de Sienne, un pigment d'argile naturelle riche en oxyde de fer, originaire de la région de Sienne en Toscane, en Italie. Son nom est donc un toponyme lié à un pigment naturel.",
@@ -99,7 +101,7 @@ export const specificFunFacts = {
   skyblue:
     "<strong>Skyblue</strong> (bleu ciel) est une couleur nommée qui évoque la teinte d'un ciel dégagé de jour. C'est un bleu vif et moyen qui est une couleur courante dans les paysages naturels.",
   mistyrose:
-    "<strong>Mistyrose</strong> (rose brumeux) est une couleur nommée qui évoque l'aspect d'une rose pâle vue à travers une brume légère ou d'un brouillard matinal. Elle est un rose très doux, légèrement grisâtre, qui suggère la délicatesse et le flou.",
+    "<strong>Mistyrose</strong> (rose brumeux) est une couleur nommée qui évoque l'aspect d'une rose pâle vue à travers une brume légère ou d'un brouillard matinal. Le nom provient d'un nuancier de peinture de la marque américaine Sinclair Paints, utilisé par les développeurs du système X11 dans les années 80 pour enrichir la liste.",
   pink: "<strong>Pink</strong> (rose) est un nom relativement jeune dans l'histoire des couleurs. Le mot désignant cette couleur n'est apparu en anglais qu'au XVIIe siècle. Avant cela, elle était souvent considérée comme une simple variation de rouge pâle ou de rouge clair. Le rose tire son nom de la fleur éponyme (le Dianthus), en anglais, pink.",
   indigo:
     "<strong>Indigo</strong> fait partie des sept couleurs de l'arc-en-ciel identifiées par Sir Isaac Newton, qui a introduit cette teinte entre le bleu et le violet pour faire correspondre l'arc-en-ciel au nombre mystique de sept notes dans la gamme musicale. Cette inclusion a parfois été remise en question.",
@@ -119,11 +121,15 @@ export const specificFunFacts = {
   gainsboro:
     "<strong>Gainsboro</strong> est une couleur nommée qui tire son nom de la marque de crayons de couleur et de fournitures artistiques Gainsborough (un hommage implicite au portraitiste anglais Thomas Gainsborough).",
   peachpuff:
-    "<strong>Peachpuff</strong> est une couleur nommée qui dérive de la teinte de la poudre pour le visage ou du fard à joues populaire dans le passé. Elle fait référence à la couleur douce et rosée du maquillage, et non directement au fruit de la pêche, bien qu'elle en soit proche.",
+    "<strong>Peachpuff</strong> est une couleur nommée qui dérive de la teinte de la poudre pour le visage ou du fard à joues populaire dans le passé. Elle ne fait donc pas référence au fruit de la pêche, bien qu'elle en soit proche. Le nom provient d'un nuancier de peinture de la marque américaine Sinclair Paints, utilisé par les développeurs du système X11 dans les années 80 pour enrichir la liste.",
   thistle:
     "<strong>Thistle</strong> est une couleur nommée qui fait référence à la couleur de la fleur de chardon écossais. C'est une nuance de violet-gris ou de lilas très pâle, souvent associée à l'Écosse ou aux paysages sauvages et rustiques.",
   orchid:
     "<strong>Orchid</strong> est une couleur nommée qui tire son nom de la couleur de la fleur d'orchidée. Le nom est utilisé pour décrire une large gamme de couleurs entre le rose et le violet, la nuance web étant un rose-violet moyen et riche.",
+  crimson:
+    "<strong>Crimson</strong> vient de l'ancien espagnol cremesin, dérivé de l'arabe qirmiz, qui désigne le Kermes, un petit insecte. Historiquement, cette couleur riche et prestigieuse n'était pas obtenue par une plante, mais en écrasant les corps séchés de ces insectes femelles. C'était un colorant de luxe réservé au clergé et à la royauté.",
+  ivory:
+    "<strong>Ivory</strong> est indissociable de l'expression culturelle anglaise \"Tickling the ivories\" (chatouiller les ivoires), qui signifie jouer du piano. Cela rappelle l'époque où les touches de piano étaient recouvertes de fines plaquettes d'ivoire d'éléphant, associant cette couleur à la musique classique et à l'élégance bourgeoise du XIXe siècle.",
   maroon:
     "<strong>Maroon</strong> est une couleur nommée qui provient du mot français <em>marron</em>, qui signifie « châtaigne ».",
   teal: "<strong>Teal</strong> est une couleur nommée qui tire son nom de la raie colorée distinctive trouvée autour de l'œil de l'oiseau du même nom, la sarcelle d'hiver. Elle est célèbre pour avoir été la couleur de fond par défaut de l'interface utilisateur de l'outil de développement Microsoft Visual Studio dans les versions 6.0 à 2005 et devenue l'emblème de toute une génération de développeurs de logiciels Microsoft.",
@@ -132,7 +138,7 @@ export const specificFunFacts = {
   aliceblue:
     "<strong>Aliceblue</strong> est une couleur nommée qui fait partie du groupe des \"blancs cassés\". On raconte qu'elle a été nommée d'après Alice Roosevelt Longworth, la fille du président américain Theodore Roosevelt, et qu'elle était sa couleur de robe favorite.",
   papayawhip:
-    "<strong>Papayawhip</strong> est une couleur nommée qui évoque la teinte d'un dessert léger et mousseux fait avec de la papaye et de la crème fouettée.",
+    "<strong>Papayawhip</strong> est une couleur nommée qui évoque la teinte d'un dessert léger et mousseux fait avec de la papaye et de la crème fouettée. Le nom provient d'un nuancier de peinture de la marque américaine Sinclair Paints, utilisé par les développeurs du système X11 dans les années 80 pour enrichir la liste.",
   mediumblue:
     "<strong>Mediumblue</strong> est une couleur nommée qui se rapproche de la teinte du Bleu de Prusse, un pigment synthétique découvert par accident au début du XVIIIe siècle. Ce pigment a été le premier pigment bleu moderne et fut important dans l'art et les uniformes militaires de l'époque.",
   goldenrod:
@@ -141,6 +147,16 @@ export const specificFunFacts = {
     "<strong>Royalblue</strong> est une couleur nommée qui dérive historiquement du bleu soutenu associé à la famille royale britannique. Elle est également très similaire à la couleur utilisée pour le logo de plusieurs grandes institutions, y compris certaines qui ont adopté des versions de ce bleu profond et noble.",
   silver:
     "<strong>Silver</strong> était massivement utilisée pour créer l'illusion de boutons tridimensionnels (l'effet de biseau et de relief) dans les interfaces graphiques (comme Windows 3.1, 95 et Mac OS) avant l'adoption des designs plats.",
+  lawngreen:
+    "<strong>Lawngreen</strong> est une couleur très saturée et artificielle (#7CFC00). Elle ne représente pas l'herbe naturelle, mais fait référence au gazon américain des banlieues résidentielles, abondamment arrosé et traité, typique de l'esthétique des années 50-60 aux USA.",
+  springgreen:
+    "<strong>Springgreen</strong> est une couleur mathématiquement intéressante car elle se situe presque exactement à mi-chemin entre le vert pur et le cyan, offrant une saturation maximale rarement atteinte par les autres couleurs naturelles.",
+  mediumspringgreen:
+    "<strong>Mediumspringgreen</strong> est la seule couleur nommée qui est composée d'un mot de couleur de base (green) et de deux descripteurs de luminance et de teinte (medium et spring), ce qui en fait un terme de couleur très précis dans la nomenclature.",
+  lemonchiffon:
+    "<strong>Lemonchiffon</strong> est une couleur nommée qui évoque la teinte d'un tissu de coton légèrement pâle et légèrement jaune. Le nom provient d'un nuancier de peinture de la marque américaine Sinclair Paints, utilisé par les développeurs du système X11 dans les années 80 pour enrichir la liste. À noter que la couleur <code>lemon</code> seule n'existe pas en CSS.",
+  whitesmoke:
+    "<strong>Whitesmoke</strong> n'est pas tout à fait blanc. Son nom fait référence à la couleur de la fumée de combustion propre ou de la vapeur, un blanc très légèrement grisé, utilisé historiquement pour distinguer les types de fumées industrielles.",
 };
 
 // Historical colors from HTML 4.01 (1999)
