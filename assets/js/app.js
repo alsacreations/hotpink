@@ -46,18 +46,17 @@ function init() {
   renderFavorites();
   renderPalettes();
 
-  // Check URL params for initial search
-  const params = new URLSearchParams(window.location.search);
-  const searchParam = params.get("search");
-  if (searchParam) {
+  // Check URL hash for initial color
+  const hash = window.location.hash.slice(1); // Remove the '#'
+  if (hash) {
     const color = colorsWithHsl.find(
-      (c) => c.name.toLowerCase() === searchParam.toLowerCase()
+      (c) => c.name.toLowerCase() === hash.toLowerCase()
     );
     if (color) {
       selectColor(color);
     }
   } else {
-    // Display "hotpink" by default if no search parameter
+    // Display "hotpink" by default if no hash
     const hotpink = colorsWithHsl.find(
       (c) => c.name.toLowerCase() === "hotpink"
     );
@@ -240,6 +239,20 @@ function renderSpecialResults(colors, filterType) {
     colors.length > 1 ? "s" : ""
   })`;
 
+  // Update page title
+  const pageTitles = {
+    "all-lightness": "Toutes les couleurs",
+    historical: "Couleurs historiques",
+    pastel: "Couleurs pastel",
+    vintage: "Couleurs vintage",
+    grays: "Niveaux de gris",
+    edible: "Couleurs comestibles",
+    plants: "Plantes & Fleurs",
+    minerals: "Minéraux & Pierres",
+    system: "Couleurs système",
+  };
+  document.title = `Hotpink.com - ${pageTitles[filterType] || "Filtre"}`;
+
   // Show description if available
   if (descriptions[filterType]) {
     filterDescription.innerHTML = descriptions[filterType];
@@ -326,10 +339,11 @@ function renderSuggestions(matches) {
 }
 
 function selectColor(color) {
-  // Update URL
-  const url = new URL(window.location);
-  url.searchParams.set("search", color.name);
-  window.history.pushState({}, "", url);
+  // Update URL hash
+  window.history.pushState({}, "", `#${color.name}`);
+
+  // Update page title
+  document.title = `Hotpink.com - couleur ${color.name}`;
 
   // Update slider position
   hueSlider.value = Math.round(color.hsl.h);
@@ -664,6 +678,9 @@ function loadPalette(palette) {
   const container = nearbyColorsContainer.parentElement;
   const title = container.querySelector("h2");
   title.textContent = `Palette : ${palette.name}`;
+
+  // Update page title
+  document.title = `Hotpink.com - palette ${palette.name}`;
 
   // Description
   filterDescription.textContent = `Couleurs : ${palette.colors.join(", ")}`;
