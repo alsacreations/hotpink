@@ -85,6 +85,22 @@ function setupEventListeners() {
       suggestionsList.hidden = true;
     }
   });
+
+  // Handle browser back/forward navigation
+  window.addEventListener("popstate", () => {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const color = colorsWithHsl.find(
+        (c) => c.name.toLowerCase() === hash.toLowerCase()
+      );
+      if (color) {
+        renderSelectedColor(color);
+        renderNearbyColors(color);
+        resultsSection.hidden = false;
+        hueSlider.value = Math.round(color.hsl.h);
+      }
+    }
+  });
 }
 
 function handleSearchInput(e) {

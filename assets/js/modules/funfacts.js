@@ -4,6 +4,7 @@
 export const specificFunFacts = {
   orange:
     "<strong>Orange</strong> est la 17e couleur nommée, elle est la seule à avoir été introduite en CSS 2.1.",
+  red: "<strong>Red</strong> est l'un des noms de couleurs les plus courts (3 caractères).",
   darkgray:
     "<strong>Darkgray</strong> est plus claire que <code>gray</code>\u202f!",
   darkgrey:
@@ -16,7 +17,7 @@ export const specificFunFacts = {
     "<strong>Indigo</strong> est un nom de couleur dérivé d'une plante du genre Indigofera, dont on tirait historiquement un colorant bleu foncé très précieux.",
   chocolate:
     "<strong>Chocolate</strong> est un exemple de la façon dont les noms de couleurs populaires ont été ajoutés à la spécification. Elle était courante dans les palettes X11, reflétant la popularité de cette teinte de brun-rouge. C'est l'une des couleurs qui tente de représenter une texture ou une matière plutôt qu'une teinte chromatique pure.",
-  tan: '<strong>Tan</strong> signifie "bronzé" en anglais. Son utilisation comme nom de couleur remonte à la fin du XIXe siècle pour décrire la couleur de la peau après l\'exposition au soleil ou la couleur du cuir tanné.',
+  tan: "<strong>Tan</strong> signifie \"bronzé\" en anglais. Son utilisation comme nom de couleur remonte à la fin du XIXe siècle pour décrire la couleur de la peau après l'exposition au soleil ou la couleur du cuir tanné. Il est également l'un des noms de couleurs les plus courts (3 caractères).",
   aqua: '<strong>Aqua</strong> est souvent lié à l\'aigue-marine (une variété de béryl) et vient du latin aqua marina signifiant "eau de mer".',
   mauve:
     "<strong>Mauve</strong> Le nom vient du mot français « mauve », qui désigne la fleur du même nom (Malvaceae).",
@@ -73,6 +74,8 @@ export const specificFunFacts = {
     "<strong>Tomato</strong> a été nommée d'après la couleur de la tomate rouge mûre. C'est une couleur rouge-orangé très vif qui est souvent utilisée pour attirer l'attention.",
   chartreuse:
     "<strong>Chartreuse</strong> a été nommée d'après la couleur de la célèbre liqueur française Chartreuse. Sa couleur vert-jaune brillante est celle de la plante utilisée pour aromatiser cette boisson.",
+  saddlebrown:
+    "<strong>Saddlebrown</strong> est une couleur nommée qui évoque la teinte du cuir huilé utilisé pour fabriquer les selles d'équitation et les harnais. C'est un brun riche et foncé, lié à l'artisanat du cuir et aux accessoires équestres.",
   salmon:
     "<strong>Salmon</strong> a été nommée d'après la couleur de la chair du poisson du même nom, qui est un rose-orangé pâle et délicat.",
   coral:
@@ -106,6 +109,30 @@ export const specificFunFacts = {
     "<strong>Darkgreen</strong> dans la palette X11 était historiquement crucial car, dans les premiers graphismes informatiques, il était souvent utilisé comme couleur de fond pour simuler le texte sur un écran cathodique (CRT) vert monochrome, avant l'arrivée des écrans couleur.",
   azure:
     "<strong>Azure</strong>. Microsoft a choisi ce nom pour son service cloud précisément parce que l'azur représente le ciel (le cloud). Ils ont capitalisé sur l'imagerie établie de la couleur : pureté, clarté, et une infinité d'espace au-dessus de la terre, ce qui correspond parfaitement au concept d'informatique en nuage.",
+  indianred:
+    "<strong>Indianred</strong> a une origine purement géographique et minérale (un pigment de terre), mais son utilisation actuelle est problématique et fait partie des noms de couleurs qui ne seraient probablement pas créés aujourd'hui en raison de sensibilités culturelles et linguistiques.",
+  ghostwhite:
+    "<strong>Ghostwhite</strong> a été nommée pour évoquer la teinte du linge ou d'un drap tel qu'il pourrait apparaître sur un fantôme (un spectre). C'est un blanc extrêmement pâle, qui fut inclus dans la liste étendue X11 pour désigner un blanc cassé qui maintient une sensation de légèreté et d'évanescence.",
+  snow: "<strong>Snow</strong> est une couleur nommée qui ne représente pas un blanc pur, mais un blanc cassé extrêmement pâle avec une très légère touche de… rouge.",
+  mintcream:
+    "<strong>Mintcream</strong> est une couleur nommée qui évoque la légèreté de la menthe combinée à la douceur de la crème. C'est le plus clair de tous les verts dans la liste des couleurs nommées, un blanc cassé avec une nuance de vert très subtile.",
+  gainsboro:
+    "<strong>Gainsboro</strong> est une couleur nommée qui tire son nom de la marque de crayons de couleur et de fournitures artistiques Gainsborough (un hommage implicite au portraitiste anglais Thomas Gainsborough).",
+  peachpuff:
+    "<strong>Peachpuff</strong> est une couleur nommée qui dérive de la teinte de la poudre pour le visage ou du fard à joues populaire dans le passé. Elle fait référence à la couleur douce et rosée du maquillage, et non directement au fruit de la pêche, bien qu'elle en soit proche.",
+  thistle:
+    "<strong>Thistle</strong> est une couleur nommée qui fait référence à la couleur de la fleur de chardon écossais. C'est une nuance de violet-gris ou de lilas très pâle, souvent associée à l'Écosse ou aux paysages sauvages et rustiques.",
+  orchid:
+    "<strong>Orchid</strong> est une couleur nommée qui tire son nom de la couleur de la fleur d'orchidée. Le nom est utilisé pour décrire une large gamme de couleurs entre le rose et le violet, la nuance web étant un rose-violet moyen et riche.",
+  maroon:
+    "<strong>Maroon</strong> est une couleur nommée qui provient du mot français marron, qui signifie « châtaigne ».",
+  teal: "<strong>Teal</strong> est une couleur nommée qui tire son nom de la raie colorée distinctive trouvée autour de l'œil de l'oiseau du même nom, la sarcelle d'hiver. Cette nuance de bleu-vert est un vert-bleu foncé et moyen, très populaire dans les années 1990 pour les interfaces utilisateur.",
+  powderblue:
+    "<strong>Powderblue</strong> est une couleur nommée qui fait référence à la poudre de couleur bleue utilisée au XVIIIe siècle pour teindre les perruques ou les vêtements. C'est un bleu-ciel très pâle et légèrement grisâtre.",
+  aliceblue:
+    "<strong>Aliceblue</strong> est une couleur nommée qui fait partie du groupe des \"blancs cassés\". On raconte qu'elle a été nommée d'après Alice Roosevelt Longworth, la fille du président américain Theodore Roosevelt, et qu'elle était sa couleur de robe favorite.",
+  papayawhip:
+    "<strong>Papayawhip</strong> est une couleur nommée qui évoque la teinte d'un dessert léger et mousseux fait avec de la papaye et de la crème fouettée.",
 };
 
 // Historical colors from HTML 4.01 (1999)
