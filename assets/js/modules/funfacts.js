@@ -62,7 +62,7 @@ export const specificFunFacts = {
   dimgrey:
     "<strong>Dimgrey</strong> est la plus sombre de toutes les variations de gris avec le préfixe de luminance (elle est plus sombre que <code>grey</code>).",
   hotpink:
-    "<strong>Hotpink</strong> est en toute objectivité la plus belle couleur de toutes. Cette couleurest culturellement liée à la créatrice de mode Elsa Schiaparelli. Dans les années 1930, elle a lancé le « Shocking Pink », une couleur considérée comme agressive et provocante pour l'époque, qui est devenue sa signature. Le hotpink du web est l'héritier numérique de cette audace féministe et artistique.",
+    "<strong>Hotpink</strong> est en toute objectivité la plus belle couleur de toutes. Cette couleur est culturellement liée à la créatrice de mode Elsa Schiaparelli. Dans les années 1930, elle a lancé le « Shocking Pink », une couleur considérée comme agressive et provocante pour l'époque, qui est devenue sa signature. Le hotpink du web est l'héritier numérique de cette audace féministe et artistique.",
   navajowhite:
     "<strong>Navajowhite</strong> a été nommée d'après la couleur de fond du drapeau de la Nation Navajo.",
   olive:
@@ -148,7 +148,9 @@ export const specificFunFacts = {
   silver:
     "<strong>Silver</strong> était massivement utilisée pour créer l'illusion de boutons tridimensionnels (l'effet de biseau et de relief) dans les interfaces graphiques (comme Windows 3.1, 95 et Mac OS) avant l'adoption des designs plats.",
   lawngreen:
-    "<strong>Lawngreen</strong> est une couleur très saturée et artificielle (#7CFC00). Elle ne représente pas l'herbe naturelle, mais fait référence au gazon américain des banlieues résidentielles, abondamment arrosé et traité, typique de l'esthétique des années 50-60 aux USA.",
+    "<strong>Lawngreen</strong> est une couleur très saturée et artificielle. Elle ne représente pas l'herbe naturelle, mais fait référence au gazon américain des banlieues résidentielles, abondamment arrosé et traité, typique de l'esthétique des années 50-60 aux USA.",
+  bisque:
+    "<strong>Bisque</strong> a été incluse dans la liste étendue X11 car elle faisait partie des noms de couleurs qui décrivaient des nuances alimentaires claires et chaleureuses (comme <code>papayawhip</code> et <code>lemonchiffon</code>).",
   springgreen:
     "<strong>Springgreen</strong> est une couleur mathématiquement intéressante car elle se situe presque exactement à mi-chemin entre le vert pur et le cyan, offrant une saturation maximale rarement atteinte par les autres couleurs naturelles.",
   mediumspringgreen:
