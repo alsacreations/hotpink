@@ -94,7 +94,7 @@ function setupEventListeners() {
         (c) => c.name.toLowerCase() === hash.toLowerCase()
       );
       if (color) {
-        document.title = `Hotpink.com - couleur ${color.name}`;
+        document.title = `Hotpink - Couleur ${color.name}`;
         renderSelectedColor(color);
         renderNearbyColors(color);
         resultsSection.hidden = false;
@@ -268,7 +268,7 @@ function renderSpecialResults(colors, filterType) {
     minerals: "Minéraux & Pierres",
     system: "Couleurs système",
   };
-  document.title = `Hotpink.com - ${pageTitles[filterType] || "Filtre"}`;
+  document.title = `Hotpink - ${pageTitles[filterType] || "Filtre"}`;
 
   // Show description if available
   if (descriptions[filterType]) {
@@ -360,7 +360,7 @@ function selectColor(color) {
   window.history.pushState({}, "", `#${color.name}`);
 
   // Update page title
-  document.title = `Hotpink.com - couleur ${color.name}`;
+  document.title = `Hotpink - couleur ${color.name}`;
 
   // Update slider position
   hueSlider.value = Math.round(color.hsl.h);
@@ -697,7 +697,7 @@ function loadPalette(palette) {
   title.textContent = `Palette : ${palette.name}`;
 
   // Update page title
-  document.title = `Hotpink.com - palette ${palette.name}`;
+  document.title = `Hotpink - Palette ${palette.name}`;
 
   // Description
   filterDescription.textContent = `Couleurs : ${palette.colors.join(", ")}`;
