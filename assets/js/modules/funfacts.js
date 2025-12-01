@@ -54,9 +54,9 @@ export const specificFunFacts = {
   green:
     "<strong>Green</strong> est en fait un vert sombre (<code>#008000</code>), tandis que <code>lime</code> correspond au vert pur (<code>#00FF00</code>).",
   darkslategray:
-    "<strong>Darkslategray</strong> est une couleur qui, malgré son nom, est souvent décrite comme un vert très foncé plutôt qu'un gris-bleu foncé.",
+    "<strong>Darkslategray</strong> est une couleur qui, malgré son nom, est souvent décrite comme un vert très foncé plutôt qu'un gris-bleu foncé. Elle était souvent utilisée pour le texte ou les éléments de fond foncés dans les premiers navigateurs web.",
   darkslategrey:
-    "<strong>Darkslategrey</strong> est une couleur qui, malgré son nom, est souvent décrite comme un vert très foncé plutôt qu'un gris-bleu foncé.",
+    "<strong>Darkslategrey</strong> est une couleur qui, malgré son nom, est souvent décrite comme un vert très foncé plutôt qu'un gris-bleu foncé. Elle était souvent utilisée pour le texte ou les éléments de fond foncés dans les premiers navigateurs web.",
   dimgray:
     "<strong>Dimgray</strong> est la plus sombre de toutes les variations de gris avec le préfixe de luminance (elle est plus sombre que <code>gray</code>).",
   dimgrey:
@@ -126,7 +126,7 @@ export const specificFunFacts = {
     "<strong>Orchid</strong> est une couleur nommée qui tire son nom de la couleur de la fleur d'orchidée. Le nom est utilisé pour décrire une large gamme de couleurs entre le rose et le violet, la nuance web étant un rose-violet moyen et riche.",
   maroon:
     "<strong>Maroon</strong> est une couleur nommée qui provient du mot français marron, qui signifie « châtaigne ».",
-  teal: "<strong>Teal</strong> est une couleur nommée qui tire son nom de la raie colorée distinctive trouvée autour de l'œil de l'oiseau du même nom, la sarcelle d'hiver. Cette nuance de bleu-vert est un vert-bleu foncé et moyen, très populaire dans les années 1990 pour les interfaces utilisateur.",
+  teal: "<strong>Teal</strong> est une couleur nommée qui tire son nom de la raie colorée distinctive trouvée autour de l'œil de l'oiseau du même nom, la sarcelle d'hiver. Elle est célèbre pour avoir été la couleur de fond par défaut de l'interface utilisateur de l'outil de développement Microsoft Visual Studio dans les versions 6.0 à 2005 et devenue l'emblème de toute une génération de développeurs de logiciels Microsoft.",
   powderblue:
     "<strong>Powderblue</strong> est une couleur nommée qui fait référence à la poudre de couleur bleue utilisée au XVIIIe siècle pour teindre les perruques ou les vêtements. C'est un bleu-ciel très pâle et légèrement grisâtre.",
   aliceblue:
@@ -137,6 +137,10 @@ export const specificFunFacts = {
     "<strong>Mediumblue</strong> est une couleur nommée qui se rapproche de la teinte du Bleu de Prusse, un pigment synthétique découvert par accident au début du XVIIIe siècle. Ce pigment a été le premier pigment bleu moderne et fut important dans l'art et les uniformes militaires de l'époque.",
   goldenrod:
     "<strong>Goldenrod</strong> est une couleur nommée d'après la plante du même nom (Solidago). Historiquement, cette plante était parfois utilisée pour produire un colorant jaune naturel. La couleur web est un jaune doré soutenu (#DAA520), souvent utilisé pour son association à la richesse et à l'automne.",
+  royalblue:
+    "<strong>Royalblue</strong> est une couleur nommée qui dérive historiquement du bleu soutenu associé à la famille royale britannique. Elle est également très similaire à la couleur utilisée pour le logo de plusieurs grandes institutions, y compris certaines qui ont adopté des versions de ce bleu profond et noble.",
+  silver:
+    "<strong>Silver</strong> était massivement utilisée pour créer l'illusion de boutons tridimensionnels (l'effet de biseau et de relief) dans les interfaces graphiques (comme Windows 3.1, 95 et Mac OS) avant l'adoption des designs plats.",
 };
 
 // Historical colors from HTML 4.01 (1999)
