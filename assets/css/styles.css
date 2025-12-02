@@ -30,6 +30,9 @@
 input {
   --input-border-color-hover: var(--primary-darken);
 }
+select {
+  --select-border-color-hover: var(--primary-darken);
+}
 button {
   --button-border-color-hover: var(--primary-darken);
 }
