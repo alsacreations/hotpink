@@ -62,33 +62,46 @@ export function getDominantColor(imageElement) {
     }
   }
 
-  // Find the most frequent color (mode)
-  let maxCount = 0;
-  let dominantColor = null;
+  // Sort colors by frequency
+  const sortedColors = Object.entries(colorCounts)
+    .map(([key, data]) => {
+      const avgR = data.r / data.count;
+      const avgG = data.g / data.count;
+      const avgB = data.b / data.count;
 
-  for (const colorKey in colorCounts) {
-    const colorData = colorCounts[colorKey];
+      // Calculate saturation (to prefer colorful colors over grays)
+      const max = Math.max(avgR, avgG, avgB);
+      const min = Math.min(avgR, avgG, avgB);
+      const saturation = max === 0 ? 0 : (max - min) / max;
 
-    // Skip very dark or very light colors (likely background)
-    const avgR = colorData.r / colorData.count;
-    const avgG = colorData.g / colorData.count;
-    const avgB = colorData.b / colorData.count;
-    const brightness = (avgR + avgG + avgB) / 3;
-
-    // Skip colors that are too dark (< 20) or too light (> 235)
-    if (brightness < 20 || brightness > 235) continue;
-
-    if (colorData.count > maxCount) {
-      maxCount = colorData.count;
-      dominantColor = {
+      return {
         r: Math.round(avgR),
         g: Math.round(avgG),
         b: Math.round(avgB),
+        count: data.count,
+        saturation,
       };
-    }
-  }
+    })
+    .sort((a, b) => b.count - a.count); // Sort by frequency
 
-  // Fallback to average if no suitable color found
+  // Take top 5 most frequent colors and find the most saturated one
+  const topColors = sortedColors.slice(0, 5);
+  const dominantColor = topColors.reduce((best, current) => {
+    // Prefer more saturated colors (avoid grays/blacks/whites)
+    if (current.saturation > best.saturation) {
+      return current;
+    }
+    // If saturation is similar, prefer more frequent
+    if (
+      Math.abs(current.saturation - best.saturation) < 0.1 &&
+      current.count > best.count
+    ) {
+      return current;
+    }
+    return best;
+  }, topColors[0]);
+
+  // Fallback if no color found
   if (!dominantColor) {
     let r = 0,
       g = 0,
@@ -103,10 +116,15 @@ export function getDominantColor(imageElement) {
       count++;
     }
 
-    dominantColor = {
+    return {
       r: Math.round(r / count),
       g: Math.round(g / count),
       b: Math.round(b / count),
+      hex: rgbToHex(
+        Math.round(r / count),
+        Math.round(g / count),
+        Math.round(b / count)
+      ),
     };
   }
 
