@@ -74,64 +74,97 @@ export function getDominantColor(imageElement) {
       const min = Math.min(avgR, avgG, avgB);
       const saturation = max === 0 ? 0 : (max - min) / max;
 
+      // Calculate lightness (average of RGB)
+      const lightness = (avgR + avgG + avgB) / 3;
+
       return {
         r: Math.round(avgR),
         g: Math.round(avgG),
         b: Math.round(avgB),
         count: data.count,
         saturation,
+        lightness,
       };
     })
-    .sort((a, b) => b.count - a.count); // Sort by frequency
+    .sort((a, b) => b.count - a.count); // Sort by frequency first
 
-  // Take top 5 most frequent colors and find the most saturated one
-  const topColors = sortedColors.slice(0, 5);
-  const dominantColor = topColors.reduce((best, current) => {
-    // Prefer more saturated colors (avoid grays/blacks/whites)
-    if (current.saturation > best.saturation) {
-      return current;
-    }
-    // If saturation is similar, prefer more frequent
-    if (
-      Math.abs(current.saturation - best.saturation) < 0.1 &&
-      current.count > best.count
-    ) {
-      return current;
-    }
-    return best;
-  }, topColors[0]);
+  // Debug: log top 10 colors before filtering
+  console.log("Top 10 colors by frequency (before filtering):");
+  sortedColors.slice(0, 10).forEach((c, i) => {
+    console.log(
+      `${i + 1}. RGB(${c.r},${c.g},${c.b}) - Count: ${
+        c.count
+      }, Saturation: ${c.saturation.toFixed(
+        3
+      )}, Lightness: ${c.lightness.toFixed(1)}`
+    );
+  });
 
-  // Fallback if no color found
-  if (!dominantColor) {
-    let r = 0,
-      g = 0,
-      b = 0,
-      count = 0;
+  // Filter by saturation AND lightness
+  // Exclude: very dark (< 30), very light (> 240), or low saturation (< 0.1)
+  const saturatedColors = sortedColors.filter(
+    (color) =>
+      color.saturation > 0.1 && color.lightness > 30 && color.lightness < 240
+  );
 
-    for (let i = 0; i < data.length; i += 4) {
-      if (data[i + 3] < 125) continue; // Skip transparent
-      r += data[i];
-      g += data[i + 1];
-      b += data[i + 2];
-      count++;
-    }
+  console.log(
+    `Found ${saturatedColors.length} saturated and visible colors (saturation > 0.1, lightness 30-240)`
+  );
 
-    return {
-      r: Math.round(r / count),
-      g: Math.round(g / count),
-      b: Math.round(b / count),
-      hex: rgbToHex(
-        Math.round(r / count),
-        Math.round(g / count),
-        Math.round(b / count)
-      ),
-    };
+  // If we have saturated colors, take the most frequent one
+  if (saturatedColors.length > 0) {
+    // Take top 10 most frequent saturated colors and find the most saturated one
+    const topColors = saturatedColors.slice(0, 10);
+    const dominantColor = topColors.reduce((best, current) => {
+      // Prefer more saturated colors
+      if (current.saturation > best.saturation) {
+        return current;
+      }
+      // If saturation is similar, prefer more frequent
+      if (
+        Math.abs(current.saturation - best.saturation) < 0.1 &&
+        current.count > best.count
+      ) {
+        return current;
+      }
+      return best;
+    }, topColors[0]);
+
+    console.log(
+      `Selected dominant color: RGB(${dominantColor.r},${dominantColor.g},${
+        dominantColor.b
+      }) - Saturation: ${dominantColor.saturation.toFixed(3)}`
+    );
+
+    // Convert to hex
+    const hex = rgbToHex(dominantColor.r, dominantColor.g, dominantColor.b);
+    return { ...dominantColor, hex };
   }
 
-  // Convert to hex
-  const hex = rgbToHex(dominantColor.r, dominantColor.g, dominantColor.b);
+  // Fallback if no saturated color found (use average)
+  let r = 0,
+    g = 0,
+    b = 0,
+    count = 0;
 
-  return { ...dominantColor, hex };
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] < 125) continue; // Skip transparent
+    r += data[i];
+    g += data[i + 1];
+    b += data[i + 2];
+    count++;
+  }
+
+  return {
+    r: Math.round(r / count),
+    g: Math.round(g / count),
+    b: Math.round(b / count),
+    hex: rgbToHex(
+      Math.round(r / count),
+      Math.round(g / count),
+      Math.round(b / count)
+    ),
+  };
 }
 
 /**
