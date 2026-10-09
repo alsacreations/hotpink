@@ -49,8 +49,7 @@
   --spacing-80: 5rem;
 
   /* Familles de police */
-  --font-base: "Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052,
-    serif;
+  --font-base: lexend, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
   --font-chicle: chicle, serif;
 
@@ -137,4 +136,30 @@
   --color-pink: pink;
   --color-lavenderblush: lavenderblush;
   --color-lightgray: lightgray;
+
+  /* Couleurs "Pop sticker" */
+  --color-ink: #2b0b22;
+  --color-plum: #7a2f63;
+  --color-raspberry: #c2005f;
+  --color-cream: #fff8fc;
+  --color-pink-50: #ffe4f2;
+  --color-pink-100: #ffd6ea;
+  --color-pink-200: #f9b0d4;
+  --color-pink-300: #ff8fc8;
+  --color-lemon: #ffe45c;
+  --color-papayawhip: papayawhip;
+  --color-rebeccapurple: rebeccapurple;
+  --color-mediumturquoise: mediumturquoise;
+  --color-tomato: tomato;
+
+  /* Bordures */
+  --border-2: 2px;
+  --border-3: 3px;
+  --border-4: 4px;
+  --radius-20: 1.25rem;
+  --radius-32: 2rem;
+  --radius-40: 2.5rem;
+
+  /* Courbe "rebond" */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }

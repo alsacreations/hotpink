@@ -1,4 +1,20 @@
 // Quiz Module
+const CONFETTI_COLORS = [
+  "#ff69b4",
+  "#ffe45c",
+  "#48d1cc",
+  "#663399",
+  "#ffffff",
+  "#ff6347",
+];
+
+const MESSAGES = [
+  [10, "Parfait ! Vous connaissez les couleurs CSS sur le bout des doigts 🏆"],
+  [7, "Bravo, votre œil est affûté !"],
+  [4, "Pas mal ! Encore quelques nuances à apprivoiser."],
+  [0, "Les couleurs nommées ont encore des secrets pour vous… Rejouez !"],
+];
+
 export class ColorQuiz {
   constructor(colors) {
     this.colors = colors.filter((c) => !c.system); // Exclude system colors
@@ -6,6 +22,7 @@ export class ColorQuiz {
     this.currentQuestion = 0;
     this.score = 0;
     this.questions = [];
+    this.history = [];
 
     this.initElements();
     this.attachEventListeners();
@@ -22,15 +39,20 @@ export class ColorQuiz {
     this.replayBtn = document.getElementById("quiz-replay-btn");
     this.colorNameEl = document.getElementById("quiz-color-name");
     this.choicesEl = document.getElementById("quiz-choices");
+    this.answerEl = document.getElementById("quiz-answer");
     this.feedbackEl = document.getElementById("quiz-feedback");
+    this.progressEl = document.getElementById("quiz-progress");
     this.currentScoreEl = document.getElementById("quiz-current-score");
     this.questionNumEl = document.getElementById("quiz-question-num");
     this.finalScoreEl = document.getElementById("quiz-final-score");
+    this.burstScoreEl = document.getElementById("quiz-burst-score");
     this.messageEl = document.getElementById("quiz-message");
+    this.confettiEl = document.getElementById("quiz-confetti");
   }
 
   attachEventListeners() {
-    this.closeBtn.addEventListener("click", () => this.close());
+    this.closeBtn.addEventListener("click", () => this.dialog.close());
+    this.dialog.addEventListener("close", () => this.reset());
     this.startBtn.addEventListener("click", () => this.startGame());
     this.nextBtn.addEventListener("click", () => this.nextQuestion());
     this.replayBtn.addEventListener("click", () => this.startGame());
@@ -40,8 +62,8 @@ export class ColorQuiz {
     this.dialog.showModal();
   }
 
-  close() {
-    this.dialog.close();
+  reset() {
+    this.confettiEl.innerHTML = "";
     this.showScreen("start");
   }
 
@@ -54,6 +76,7 @@ export class ColorQuiz {
   startGame() {
     this.currentQuestion = 0;
     this.score = 0;
+    this.history = [];
     this.questions = this.generateQuestions();
     this.showScreen("game");
     this.displayQuestion();
@@ -79,14 +102,14 @@ export class ColorQuiz {
 
       usedColors.add(correctColor.name);
 
-      // Generate 5 wrong answers (6 choices total)
+      // Generate 5 wrong answers (6 choices total), with distinct hex values
       const wrongColors = [];
       while (wrongColors.length < 5) {
         const randomColor =
           this.colors[Math.floor(Math.random() * this.colors.length)];
         if (
-          randomColor.name !== correctColor.name &&
-          !wrongColors.find((c) => c.name === randomColor.name)
+          randomColor.hex !== correctColor.hex &&
+          !wrongColors.find((c) => c.hex === randomColor.hex)
         ) {
           wrongColors.push(randomColor);
         }
@@ -106,25 +129,44 @@ export class ColorQuiz {
     return questions;
   }
 
+  renderProgress() {
+    this.progressEl.innerHTML = "";
+    for (let i = 0; i < this.totalQuestions; i++) {
+      const li = document.createElement("li");
+      if (i < this.history.length) {
+        li.className = this.history[i] ? "is-ok" : "is-ko";
+      } else if (i === this.currentQuestion) {
+        li.className = "is-current";
+      }
+      this.progressEl.appendChild(li);
+    }
+  }
+
   displayQuestion() {
     const question = this.questions[this.currentQuestion];
+    const name = question.correctColor.name;
 
-    this.colorNameEl.textContent = question.correctColor.name;
+    this.colorNameEl.textContent = name;
+    this.colorNameEl.style.setProperty(
+      "--q-size",
+      name.length <= 10 ? "5rem" : name.length <= 15 ? "3.875rem" : "3.125rem"
+    );
     this.questionNumEl.textContent = this.currentQuestion + 1;
     this.currentScoreEl.textContent = this.score;
-    this.feedbackEl.hidden = true;
-    this.nextBtn.hidden = true;
+    this.answerEl.hidden = true;
+    this.renderProgress();
 
     // Clear previous choices
     this.choicesEl.innerHTML = "";
 
     // Create choice buttons
-    question.choices.forEach((color) => {
+    question.choices.forEach((color, index) => {
       const button = document.createElement("button");
+      button.type = "button";
       button.className = "quiz-choice";
-      button.style.backgroundColor = color.hex;
-      button.setAttribute("data-color", color.name);
-      button.setAttribute("aria-label", `Choisir cette couleur`);
+      button.style.setProperty("--swatch", color.hex);
+      button.dataset.color = color.name;
+      button.setAttribute("aria-label", `Choix ${index + 1}`);
       button.addEventListener("click", () => this.checkAnswer(color.name));
       this.choicesEl.appendChild(button);
     });
@@ -138,55 +180,97 @@ export class ColorQuiz {
       this.score++;
       this.currentScoreEl.textContent = this.score;
     }
+    this.history.push(isCorrect);
+    this.renderProgress();
 
-    // Disable all choices
+    // Disable all choices and reveal their names
     const choices = this.choicesEl.querySelectorAll(".quiz-choice");
     choices.forEach((choice) => {
-      choice.classList.add("disabled");
-      choice.style.pointerEvents = "none";
+      const name = choice.dataset.color;
+      choice.disabled = true;
+      choice.setAttribute("aria-label", name);
 
-      if (choice.dataset.color === question.correctColor.name) {
-        choice.classList.add("correct");
-      } else if (choice.dataset.color === selectedColorName && !isCorrect) {
-        choice.classList.add("incorrect");
+      if (name === question.correctColor.name) {
+        choice.classList.add("is-correct");
+        choice.insertAdjacentHTML(
+          "beforeend",
+          '<span class="quiz-choice-mark" aria-hidden="true">✓</span>'
+        );
+      } else if (name === selectedColorName) {
+        choice.classList.add("is-wrong");
+        choice.insertAdjacentHTML(
+          "beforeend",
+          '<span class="quiz-choice-mark" aria-hidden="true">✕</span>'
+        );
+      } else {
+        choice.classList.add("is-dim");
       }
+
+      const label = document.createElement("span");
+      label.className = "quiz-choice-name";
+      label.textContent = name;
+      choice.appendChild(label);
     });
 
     // Show feedback
-    this.feedbackEl.hidden = false;
-    this.feedbackEl.className = `quiz-feedback ${
-      isCorrect ? "correct" : "incorrect"
-    }`;
+    this.feedbackEl.classList.toggle("is-ok", isCorrect);
     this.feedbackEl.textContent = isCorrect
-      ? "✅ Bravo\u202f! C'est la bonne couleur\u202f!"
-      : `❌ Oups\u202f! C'est ${selectedColorName}`;
+      ? `Bravo ! C'est bien ${question.correctColor.name} 🎉`
+      : `Raté… vous avez choisi ${selectedColorName}.`;
 
-    // Show next button or end game
-    if (this.currentQuestion < this.totalQuestions - 1) {
-      this.nextBtn.hidden = false;
-    } else {
-      setTimeout(() => this.showResults(), 2000);
-    }
+    const isLast = this.currentQuestion >= this.totalQuestions - 1;
+    this.nextBtn.textContent = isLast
+      ? "Voir le résultat →"
+      : "Question suivante →";
+    this.answerEl.hidden = false;
+    this.nextBtn.focus();
+
+    if (isCorrect) this.launchConfetti();
   }
 
   nextQuestion() {
+    if (this.currentQuestion >= this.totalQuestions - 1) {
+      this.showResults();
+      return;
+    }
     this.currentQuestion++;
     this.displayQuestion();
+  }
+
+  launchConfetti() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    this.confettiEl.innerHTML = "";
+    const count = 44;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + (i % 3) * 0.2;
+      const distance = 260 + ((i * 53) % 260);
+      const piece = document.createElement("span");
+      piece.style.cssText = `
+        width: ${i % 2 ? 16 : 12}px;
+        height: ${i % 2 ? 10 : 12}px;
+        border-radius: ${i % 3 === 0 ? "50%" : "3px"};
+        --confetti-color: ${CONFETTI_COLORS[i % CONFETTI_COLORS.length]};
+        --x: ${Math.cos(angle) * distance}px;
+        --y: ${Math.sin(angle) * distance}px;
+        --rot: ${(i * 47) % 720}deg;
+        --duration: ${0.9 + (i % 5) * 0.12}s;
+      `;
+      this.confettiEl.appendChild(piece);
+    }
+    clearTimeout(this.confettiTimer);
+    this.confettiTimer = setTimeout(() => {
+      this.confettiEl.innerHTML = "";
+    }, 1600);
   }
 
   showResults() {
     this.showScreen("results");
     this.finalScoreEl.textContent = this.score;
+    this.burstScoreEl.textContent = this.score;
 
-    let message = "";
-    if (this.score === 5) {
-      message = "🏆 Parfait ! Vous êtes un expert des couleurs CSS !";
-    } else if (this.score >= 3) {
-      message = "👍 Bien joué ! Vous connaissez bien vos couleurs !";
-    } else {
-      message = "💪 Continuez à vous entraîner, vous progresserez !";
-    }
-
-    this.messageEl.textContent = message;
+    const message = MESSAGES.find(([min]) => this.score >= min);
+    this.messageEl.textContent = message[1];
+    this.replayBtn.focus();
   }
 }

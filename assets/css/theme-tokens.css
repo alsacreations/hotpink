@@ -24,7 +24,7 @@
 
   /* Couleur primaire */
   --primary: var(--color-hotpink);
-  --on-primary: var(--color-gray-900);
+  --on-primary: var(--color-ink);
   --primary-lighten: oklch(from var(--primary) calc(l * 1.2) c h);
   --primary-darken: oklch(from var(--primary) calc(l * 0.8) c h);
 
@@ -33,8 +33,25 @@
   --accent-invert: light-dark(var(--primary-lighten), var(--primary));
 
   /* Surface du document */
-  --surface: light-dark(var(--color-lavenderblush), var(--color-gray-900));
-  --on-surface: light-dark(var(--color-gray-900), var(--color-gray-100));
+  --surface: var(--color-pink-100);
+  --surface-dots: var(--color-pink-200);
+  --on-surface: var(--color-ink);
+  --on-surface-subtle: var(--color-plum);
+
+  /* Cartes et champs (style "sticker") */
+  --card: var(--color-cream);
+  --field: var(--color-white);
+  --field-hover: var(--color-pink-50);
+  --highlight: var(--color-lemon);
+  --ink: var(--color-ink);
+  --on-ink: var(--color-white);
+  --sticker-border: var(--border-3) solid var(--ink);
+  --sticker-border-thin: 2.5px solid var(--ink);
+  --shadow-xs: 3px 3px 0 var(--ink);
+  --shadow-s: 5px 5px 0 var(--ink);
+  --shadow-m: 7px 7px 0 var(--ink);
+  --shadow-l: 10px 10px 0 var(--ink);
+  --shadow-xl: 12px 12px 0 var(--ink);
 
   /* Niveaux de profondeur */
   --layer-1: light-dark(var(--color-gray-100), var(--color-gray-800));
@@ -42,8 +59,8 @@
   --layer-3: light-dark(var(--color-gray-300), var(--color-gray-600));
 
   /* Interactions */
-  --link: light-dark(var(--primary), var(--primary-lighten));
-  --link-hover: light-dark(var(--primary-darken), var(--primary));
+  --link: var(--color-ink);
+  --link-hover: var(--color-raspberry);
   --link-active: light-dark(var(--primary-darken), var(--primary));
 
   /* Couleur de sélection */
@@ -57,6 +74,7 @@
 
   /* Bordures */
   --border-light: var(--color-lightgray);
+  --border-color: var(--color-ink);
 
   /* Tailles de police */
   --text-s: var(--text-14);
@@ -125,7 +143,7 @@
   );
   --on-form-control: light-dark(var(--color-gray-900), var(--color-gray-100));
   --form-control-spacing: var(--spacing-12) var(--spacing-16);
-  --form-control-border-width: 1px;
-  --form-control-border-color: var(--primary);
-  --form-control-border-radius: var(--radius-24);
+  --form-control-border-width: var(--border-3);
+  --form-control-border-color: var(--ink);
+  --form-control-border-radius: var(--radius-full);
 }

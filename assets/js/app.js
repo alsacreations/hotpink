@@ -2,7 +2,7 @@ import { namedColors } from "./modules/colors.js";
 import {
   hexToRgb,
   rgbToHsl,
-  getAccessibleTextColor,
+  getContrastRatio,
   hexToOklch,
 } from "./modules/utils.js";
 import { filterFunctions } from "./modules/filters.js";
@@ -14,60 +14,117 @@ import { getDominantColor } from "./modules/image-color.js";
 // DOM Elements
 const searchInput = document.getElementById("color-search");
 const suggestionsList = document.getElementById("search-suggestions");
-const resultsSection = document.getElementById("results-section");
 const selectedColorDisplay = document.getElementById("selected-color-display");
+const resultsTitle = document.getElementById("results-title");
 const nearbyColorsContainer = document.getElementById("nearby-colors");
-const favoritesSection = document.getElementById("favorites-section");
 const favoritesList = document.getElementById("favorites-list");
 const palettesList = document.getElementById("palettes-list");
 
 const hueSlider = document.getElementById("hue-slider");
-const specialFilterSelect = document.getElementById("special-filter");
+const filterChips = document.querySelectorAll("#special-filters .chip");
 const filterDescription = document.getElementById("filter-description");
 
 const imageUpload = document.getElementById("image-upload");
-const imageCanvas = document.getElementById("image-canvas");
+const imageResult = document.getElementById("image-result");
+const imageThumb = document.getElementById("image-thumb");
+const imageHex = document.getElementById("image-hex");
+const imageNear = document.getElementById("image-near");
+
+const marqueeTrack = document.getElementById("marquee-track");
+const toast = document.getElementById("toast");
+
+const MARQUEE_COLORS = [
+  "hotpink",
+  "papayawhip",
+  "rebeccapurple",
+  "peachpuff",
+  "mediumturquoise",
+  "gold",
+  "tomato",
+  "lavenderblush",
+  "chartreuse",
+  "orchid",
+  "lightgoldenrodyellow",
+  "cornflowerblue",
+];
+
+const FILTER_TITLES = {
+  "all-lightness": "Toutes les couleurs (par luminosité) ☀️",
+  historical: "Couleurs historiques 🕰️",
+  pastel: "Couleurs pastel 🍬",
+  vintage: "Couleurs vintage 📻",
+  grays: "Niveaux de gris 🐘",
+  edible: "Couleurs comestibles 😋",
+  plants: "Plantes & Fleurs 🌸",
+  minerals: "Minéraux & Pierres 💎",
+  system: "Couleurs système 🖥️",
+};
+
+const FILTER_DESCRIPTIONS = {
+  "all-lightness":
+    "L'ensemble des 148 couleurs CSS nommées (147 de CSS3 + rebeccapurple ajoutée en CSS4), hors couleurs système, triées de la plus claire à la plus sombre.",
+  historical:
+    "Les 16 couleurs originelles du HTML, héritées du système VGA. Elles sont supportées par tous les navigateurs depuis toujours.",
+  pastel:
+    "Couleurs douces et claires, parfaites pour créer des interfaces délicates et apaisantes.",
+  vintage:
+    "Palette de couleurs chaudes et terreuses évoquant les années 50 à 70, pour un aspect rétro et nostalgique.",
+  grays:
+    "Toutes les nuances de gris disponibles en CSS, du noir au blanc. Essentielles pour les hiérarchies visuelles.",
+  edible:
+    "Couleurs inspirées par la nourriture et les boissons. De quoi donner faim en codant !",
+  plants:
+    "Couleurs évoquant la nature, les fleurs et les plantes. Apportez une touche végétale à vos interfaces.",
+  minerals:
+    "Couleurs inspirées par les pierres précieuses et les minéraux. Pour des designs qui brillent !",
+  system:
+    "Couleurs système qui s'adaptent automatiquement au thème de l'utilisateur (clair/sombre). Leur rendu dépend du navigateur.",
+};
+
+const PAGE_TITLES = {
+  "all-lightness": "Toutes les couleurs",
+  historical: "Couleurs historiques",
+  pastel: "Couleurs pastel",
+  vintage: "Couleurs vintage",
+  grays: "Niveaux de gris",
+  edible: "Couleurs comestibles",
+  plants: "Plantes & Fleurs",
+  minerals: "Minéraux & Pierres",
+  system: "Couleurs système",
+};
 
 // State
 let colorsWithHsl = [];
+let currentColor = null;
 let favorites =
   JSON.parse(localStorage.getItem("color-finder-favorites")) || [];
+
+const prefersReducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // Initialize
 function init() {
   // Pre-calculate HSL for sorting
   colorsWithHsl = namedColors.map((c) => {
-    // System colors don't have hex values, skip HSL calculation
+    // System colors don't have hex values: resolve them for display only
     if (c.system) {
-      return { ...c, hsl: { h: 0, s: 0, l: 50 } };
+      return { ...c, value: resolveSystemColor(c.hex), hsl: { h: 0, s: 0, l: 50 } };
     }
     const rgb = hexToRgb(c.hex);
     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-    return { ...c, hsl };
+    return { ...c, value: c.hex, hsl };
   });
 
+  renderMarquee();
   setupEventListeners();
   renderFavorites();
   renderPalettes();
 
-  // Check URL hash for initial color
-  const hash = window.location.hash.slice(1); // Remove the '#'
-  if (hash) {
-    const color = colorsWithHsl.find(
-      (c) => c.name.toLowerCase() === hash.toLowerCase()
-    );
-    if (color) {
-      selectColor(color);
-    }
-  } else {
-    // Display "hotpink" by default if no hash
-    const hotpink = colorsWithHsl.find(
-      (c) => c.name.toLowerCase() === "hotpink"
-    );
-    if (hotpink) {
-      selectColor(hotpink);
-    }
-  }
+  // Check URL hash for initial color, "hotpink" by default
+  const hash = window.location.hash.slice(1);
+  const initial =
+    findColor(hash) || colorsWithHsl.find((c) => c.name === "hotpink");
+  if (initial) selectColor(initial, { updateHistory: Boolean(hash) });
 
   // Initialize quiz
   const quiz = new ColorQuiz(colorsWithHsl);
@@ -76,52 +133,99 @@ function init() {
     .addEventListener("click", () => quiz.open());
 }
 
+function findColor(name) {
+  if (!name) return null;
+  return colorsWithHsl.find((c) => c.name.toLowerCase() === name.toLowerCase());
+}
+
+/**
+ * Resolve a CSS system color keyword (ex. "Canvas") to its hex value
+ * @param {string} keyword
+ * @returns {string}
+ */
+function resolveSystemColor(keyword) {
+  const probe = document.createElement("span");
+  probe.style.color = keyword;
+  document.body.appendChild(probe);
+  const channels = getComputedStyle(probe).color.match(/\d+(\.\d+)?/g) || [
+    0, 0, 0,
+  ];
+  probe.remove();
+  return (
+    "#" +
+    channels
+      .slice(0, 3)
+      .map((v) => Math.round(Number(v)).toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+
+function getTextColor(hex) {
+  return getContrastRatio(hex, "#000000") >= getContrastRatio(hex, "#ffffff")
+    ? "#1a0714"
+    : "#ffffff";
+}
+
 function setupEventListeners() {
   searchInput.addEventListener("input", handleSearchInput);
   searchInput.addEventListener("keydown", handleKeyDown);
 
   hueSlider.addEventListener("input", handleHueSlider);
-  specialFilterSelect.addEventListener("change", handleSpecialFilter);
+  filterChips.forEach((chip) =>
+    chip.addEventListener("click", () => handleSpecialFilter(chip))
+  );
 
   imageUpload.addEventListener("change", handleImageUpload);
 
   // Close suggestions on click outside
   document.addEventListener("click", (e) => {
-    if (!e.target.closest(".search-wrapper")) {
-      suggestionsList.hidden = true;
-    }
+    if (!e.target.closest(".search-wrapper")) closeSuggestions();
   });
 
   // Handle browser back/forward navigation
   window.addEventListener("popstate", () => {
-    const hash = window.location.hash.slice(1);
-    if (hash) {
-      const color = colorsWithHsl.find(
-        (c) => c.name.toLowerCase() === hash.toLowerCase()
-      );
-      if (color) {
-        document.title = `Hotpink - Couleur ${color.name}`;
-        renderSelectedColor(color);
-        renderNearbyColors(color);
-        resultsSection.hidden = false;
-        hueSlider.value = Math.round(color.hsl.h);
-      }
-    }
+    const color = findColor(window.location.hash.slice(1));
+    if (color) selectColor(color, { updateHistory: false });
   });
 }
 
+/* ----------------------------------
+ * Bandeau défilant
+ * ---------------------------------- */
+function renderMarquee() {
+  const items = [...MARQUEE_COLORS, ...MARQUEE_COLORS]
+    .map(
+      (name) =>
+        `<span class="marquee-item" style="--swatch: ${name}">${name}</span>`
+    )
+    .join("");
+  marqueeTrack.innerHTML = items;
+}
+
+/* ----------------------------------
+ * Recherche
+ * ---------------------------------- */
 function handleSearchInput(e) {
-  // Reset other filters
-  specialFilterSelect.value = "";
+  resetFilters();
 
   const query = e.target.value.toLowerCase().trim();
   if (query.length < 1) {
-    suggestionsList.hidden = true;
+    closeSuggestions();
     return;
   }
 
-  const matches = colorsWithHsl.filter((c) => c.name.includes(query));
-  renderSuggestions(matches);
+  renderSuggestions(getMatches(query));
+}
+
+function getMatches(query) {
+  return colorsWithHsl
+    .filter((c) => c.name.toLowerCase().includes(query))
+    .sort(
+      (a, b) =>
+        b.name.toLowerCase().startsWith(query) -
+          a.name.toLowerCase().startsWith(query) ||
+        a.name.length - b.name.length
+    );
 }
 
 // Keyboard Navigation State
@@ -139,18 +243,21 @@ function handleKeyDown(e) {
     e.preventDefault();
   } else if (e.key === "Enter") {
     e.preventDefault();
-    if (currentFocus > -1) {
-      if (items) items[currentFocus].click();
+    if (currentFocus > -1 && items[currentFocus]) {
+      items[currentFocus].click();
+    } else {
+      // Exact match first, then first suggestion
+      const query = searchInput.value.toLowerCase().trim();
+      const color = findColor(query) || getMatches(query)[0];
+      if (query && color) pickSuggestion(color);
     }
   } else if (e.key === "Escape") {
-    suggestionsList.hidden = true;
-    searchInput.setAttribute("aria-expanded", "false");
-    currentFocus = -1;
+    closeSuggestions();
   }
 }
 
 function addActive(items) {
-  if (!items) return;
+  if (!items.length) return;
   removeActive(items);
   if (currentFocus >= items.length) currentFocus = 0;
   if (currentFocus < 0) currentFocus = items.length - 1;
@@ -158,175 +265,22 @@ function addActive(items) {
   items[currentFocus].classList.add("suggestion-active");
   items[currentFocus].setAttribute("aria-selected", "true");
   searchInput.setAttribute("aria-activedescendant", items[currentFocus].id);
-
-  // Scroll to view
   items[currentFocus].scrollIntoView({ block: "nearest" });
 }
 
 function removeActive(items) {
-  for (let i = 0; i < items.length; i++) {
-    items[i].classList.remove("suggestion-active");
-    items[i].setAttribute("aria-selected", "false");
-  }
+  items.forEach((item) => {
+    item.classList.remove("suggestion-active");
+    item.setAttribute("aria-selected", "false");
+  });
   searchInput.removeAttribute("aria-activedescendant");
 }
 
-function handleHueSlider(e) {
-  // Reset other filters
-  specialFilterSelect.value = "";
-  searchInput.value = "";
+function closeSuggestions() {
   suggestionsList.hidden = true;
-
-  const hue = parseInt(e.target.value, 10);
-
-  // Filter colors within +/- 15 degrees of the selected hue
-  // Handle wrap-around (0/360)
-  const matches = colorsWithHsl.filter((c) => {
-    // Skip grays for hue filtering
-    if (c.hsl.s < 5) return false;
-
-    let diff = Math.abs(c.hsl.h - hue);
-    if (diff > 180) diff = 360 - diff;
-    return diff < 20; // 20 degrees tolerance
-  });
-
-  // Sort by lightness to make it look nice
-  matches.sort((a, b) => b.hsl.l - a.hsl.l);
-
-  renderHueResults(matches, hue);
-}
-
-function handleSpecialFilter(e) {
-  const filterType = e.target.value;
-
-  if (!filterType) {
-    resultsSection.hidden = true;
-    return;
-  }
-
-  // Reset other inputs
-  searchInput.value = "";
-  suggestionsList.hidden = true;
-
-  const filterFn = filterFunctions[filterType];
-  if (filterFn) {
-    const matches = filterFn(colorsWithHsl);
-    renderSpecialResults(matches, filterType);
-  }
-}
-
-function renderSpecialResults(colors, filterType) {
-  // Hide selected color display
-  selectedColorDisplay.innerHTML = "";
-  selectedColorDisplay.style.display = "none";
-
-  // Update title based on filter type
-  const container = nearbyColorsContainer.parentElement;
-  const title = container.querySelector("h2");
-
-  const titles = {
-    "all-lightness": "Toutes les couleurs (par luminosité) ☀️",
-    historical: "Couleurs historiques 🕰️",
-    pastel: "Couleurs pastel 🍬",
-    vintage: "Couleurs vintage 📻",
-    grays: "Niveaux de gris 🐘",
-    edible: "Couleurs comestibles 😋",
-    plants: "Plantes & Fleurs 🌸",
-    minerals: "Minéraux & Pierres 💎",
-    system: "Couleurs système 🖥️",
-  };
-
-  const descriptions = {
-    "all-lightness":
-      "L'ensemble des 148 couleurs CSS nommées (147 de CSS3 + rebeccapurple ajoutée en CSS4), hors couleurs système, triées de la plus claire à la plus sombre. Idéal pour trouver la nuance exacte de luminosité que vous recherchez.",
-    historical:
-      "Les 16 couleurs originelles du HTML, héritées du système VGA. Ces couleurs ont été définies dès les débuts du web et sont supportées par tous les navigateurs depuis toujours.",
-    pastel:
-      "Couleurs douces et claires, parfaites pour créer des interfaces délicates et apaisantes. Idéales pour les designs minimalistes et élégants.",
-    vintage:
-      "Palette de couleurs chaudes et terreuses évoquant les années 50 à 70. Parfaites pour donner un aspect rétro et nostalgique à vos créations.",
-    grays:
-      "Toutes les nuances de gris disponibles en CSS, du noir au blanc. Essentielles pour créer des designs monochromes sophistiqués et des hiérarchies visuelles.",
-    edible:
-      "Couleurs inspirées par la nourriture et les boissons. De quoi donner faim en codant&#8239;!",
-    plants:
-      "Couleurs évoquant la nature, les fleurs et les plantes. Apportez une touche végétale à vos interfaces.",
-    minerals:
-      "Couleurs inspirées par les pierres précieuses et les minéraux. Pour des designs qui brillent&#8239;!",
-    system:
-      "Couleurs système qui s'adaptent automatiquement au thème de l'utilisateur (clair/sombre). Utilisez-les pour respecter les préférences d'accessibilité.",
-  };
-
-  const baseTitle = titles[filterType] || "Résultats du filtre";
-  title.textContent = `${baseTitle} (${colors.length} couleur${
-    colors.length > 1 ? "s" : ""
-  })`;
-
-  // Update page title
-  const pageTitles = {
-    "all-lightness": "Toutes les couleurs",
-    historical: "Couleurs historiques",
-    pastel: "Couleurs pastel",
-    vintage: "Couleurs vintage",
-    grays: "Niveaux de gris",
-    edible: "Couleurs comestibles",
-    plants: "Plantes & Fleurs",
-    minerals: "Minéraux & Pierres",
-    system: "Couleurs système",
-  };
-  document.title = `Hotpink - ${pageTitles[filterType] || "Filtre"}`;
-
-  // Show description if available
-  if (descriptions[filterType]) {
-    filterDescription.innerHTML = descriptions[filterType];
-    filterDescription.style.display = "block";
-  } else {
-    filterDescription.style.display = "none";
-  }
-
-  nearbyColorsContainer.innerHTML = "";
-  if (colors.length === 0) {
-    nearbyColorsContainer.innerHTML =
-      '<p class="text-subtle">Aucune couleur trouvée pour ce filtre.</p>';
-  } else {
-    // Sort by lightness (descending) for better aesthetics
-    colors.sort((a, b) => b.hsl.l - a.hsl.l);
-
-    colors.forEach((c) => {
-      nearbyColorsContainer.appendChild(createColorCard(c));
-    });
-  }
-
-  resultsSection.hidden = false;
-}
-
-function renderHueResults(colors, hue) {
-  // Hide selected color display if we are browsing by hue
-  selectedColorDisplay.innerHTML = "";
-  selectedColorDisplay.style.display = "none"; // Or just empty it
-
-  // Reuse nearby-colors container for results
-  // Update title
-  const container = nearbyColorsContainer.parentElement;
-  const title = container.querySelector("h2");
-  title.textContent = `Couleurs proches de la teinte ${hue}° (${
-    colors.length
-  } couleur${colors.length > 1 ? "s" : ""})`;
-
-  // Hide description
-  filterDescription.style.display = "none";
-
-  nearbyColorsContainer.innerHTML = "";
-  if (colors.length === 0) {
-    nearbyColorsContainer.innerHTML =
-      '<p class="text-subtle">Aucune couleur trouvée pour cette teinte.</p>';
-  } else {
-    colors.forEach((c) => {
-      nearbyColorsContainer.appendChild(createColorCard(c));
-    });
-  }
-
-  resultsSection.hidden = false;
+  searchInput.setAttribute("aria-expanded", "false");
+  searchInput.removeAttribute("aria-activedescendant");
+  currentFocus = -1;
 }
 
 function renderSuggestions(matches) {
@@ -334,8 +288,7 @@ function renderSuggestions(matches) {
   currentFocus = -1;
 
   if (matches.length === 0) {
-    suggestionsList.hidden = true;
-    searchInput.setAttribute("aria-expanded", "false");
+    closeSuggestions();
     return;
   }
 
@@ -344,16 +297,13 @@ function renderSuggestions(matches) {
     li.className = "suggestion-item";
     li.id = `suggestion-${index}`;
     li.role = "option";
+    li.setAttribute("aria-selected", "false");
     li.innerHTML = `
-            <div class="suggestion-color-preview" style="background-color: ${color.hex}"></div>
-            <span>${color.name}</span>
-        `;
-    li.addEventListener("click", () => {
-      selectColor(color);
-      searchInput.value = color.name;
-      suggestionsList.hidden = true;
-      searchInput.setAttribute("aria-expanded", "false");
-    });
+      <span class="suggestion-swatch" style="--swatch: ${color.hex}" aria-hidden="true"></span>
+      <span>${color.name}</span>
+      <span class="suggestion-hex">${formatHex(color)}</span>
+    `;
+    li.addEventListener("click", () => pickSuggestion(color));
     suggestionsList.appendChild(li);
   });
 
@@ -361,203 +311,280 @@ function renderSuggestions(matches) {
   searchInput.setAttribute("aria-expanded", "true");
 }
 
-function selectColor(color) {
-  // Update URL hash
-  window.history.pushState({}, "", `#${color.name}`);
+function pickSuggestion(color) {
+  searchInput.value = color.name;
+  closeSuggestions();
+  selectColor(color, { scroll: true });
+}
 
-  // Update page title
+function formatHex(color) {
+  return color.system ? color.value.toUpperCase() : color.hex.toUpperCase();
+}
+
+/* ----------------------------------
+ * Filtres (teinte et filtres originaux)
+ * ---------------------------------- */
+function resetFilters() {
+  filterChips.forEach((chip) => chip.setAttribute("aria-pressed", "false"));
+}
+
+function handleHueSlider(e) {
+  resetFilters();
+  searchInput.value = "";
+  closeSuggestions();
+
+  const hue = parseInt(e.target.value, 10);
+  hueSlider.style.setProperty("--hue-color", `hsl(${hue} 95% 60%)`);
+
+  // Filter colors within +/- 20 degrees of the selected hue
+  // Handle wrap-around (0/360)
+  const matches = colorsWithHsl.filter((c) => {
+    // Skip grays and system colors for hue filtering
+    if (c.system || c.hsl.s < 5) return false;
+
+    let diff = Math.abs(c.hsl.h - hue);
+    if (diff > 180) diff = 360 - diff;
+    return diff < 20;
+  });
+
+  // Sort by lightness to make it look nice
+  matches.sort((a, b) => b.hsl.l - a.hsl.l);
+
+  renderList({
+    title: `Teinte ${hue}° (${pluralize(matches.length)})`,
+    colors: matches,
+    emptyText: "Aucune couleur trouvée pour cette teinte.",
+  });
+}
+
+function handleSpecialFilter(chip) {
+  const filterType = chip.dataset.filter;
+  const wasActive = chip.getAttribute("aria-pressed") === "true";
+
+  resetFilters();
+  searchInput.value = "";
+  closeSuggestions();
+
+  // Second click on the active chip: back to nearby colors
+  if (wasActive) {
+    if (currentColor) selectColor(currentColor, { updateHistory: false });
+    return;
+  }
+
+  chip.setAttribute("aria-pressed", "true");
+
+  const filterFn = filterFunctions[filterType];
+  if (!filterFn) return;
+
+  // Sort by lightness (descending) for better aesthetics
+  const matches = filterFn(colorsWithHsl).sort((a, b) => b.hsl.l - a.hsl.l);
+
+  document.title = `Hotpink - ${PAGE_TITLES[filterType] || "Filtre"}`;
+  renderList({
+    title: `${FILTER_TITLES[filterType] || "Résultats du filtre"} (${pluralize(
+      matches.length
+    )})`,
+    description: FILTER_DESCRIPTIONS[filterType],
+    colors: matches,
+    emptyText: "Aucune couleur trouvée pour ce filtre.",
+  });
+}
+
+function pluralize(count) {
+  return `${count} couleur${count > 1 ? "s" : ""}`;
+}
+
+/* ----------------------------------
+ * Liste de couleurs (proches, filtres, palettes)
+ * ---------------------------------- */
+function renderList({ title, description = "", colors, emptyText = "" }) {
+  resultsTitle.textContent = title;
+  filterDescription.textContent = description;
+  filterDescription.hidden = !description;
+
+  nearbyColorsContainer.innerHTML = "";
+  if (colors.length === 0) {
+    nearbyColorsContainer.innerHTML = `<p class="empty-state">${emptyText}</p>`;
+    return;
+  }
+  colors.forEach((c) => nearbyColorsContainer.appendChild(createColorCard(c)));
+}
+
+function createColorCard(color) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "color-card";
+  button.setAttribute("aria-label", `Sélectionner la couleur ${color.name}`);
+  button.innerHTML = `
+    <span class="color-card-swatch" style="--swatch: ${color.hex}"></span>
+    <span class="color-card-name">${color.name}</span>
+    <span class="color-card-hex">${formatHex(color)}</span>
+  `;
+  button.addEventListener("click", () => {
+    searchInput.value = "";
+    closeSuggestions();
+    selectColor(color, { scroll: true });
+  });
+  return button;
+}
+
+/* ----------------------------------
+ * Sélection d'une couleur
+ * ---------------------------------- */
+function selectColor(color, { updateHistory = true, scroll = false } = {}) {
+  currentColor = color;
+
+  if (updateHistory && window.location.hash.slice(1) !== color.name) {
+    window.history.pushState({}, "", `#${color.name}`);
+  }
   document.title = `Hotpink - couleur ${color.name}`;
 
   // Update slider position
-  hueSlider.value = Math.round(color.hsl.h);
+  if (!color.system) {
+    const hue = Math.round(color.hsl.h);
+    hueSlider.value = hue;
+    hueSlider.style.setProperty("--hue-color", `hsl(${hue} 95% 60%)`);
+  }
 
-  // Reset display if it was hidden by hue slider
-  selectedColorDisplay.style.display = "";
-  const container = nearbyColorsContainer.parentElement;
-  container.querySelector("h2").textContent = "Couleurs proches";
-
-  // Hide description
-  filterDescription.style.display = "none";
-
+  resetFilters();
   renderSelectedColor(color);
   renderNearbyColors(color);
-  resultsSection.hidden = false;
+
+  if (scroll) {
+    selectedColorDisplay.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+    });
+  }
+}
+
+function getLevel(ratio) {
+  if (ratio >= 7) return "AAA";
+  if (ratio >= 4.5) return "AA";
+  if (ratio >= 3) return "AA grand texte";
+  return "Insuffisant";
+}
+
+function formatRatio(ratio) {
+  return `${ratio.toFixed(2).replace(".", ",")}:1`;
 }
 
 function renderSelectedColor(color) {
-  const isFav = favorites.includes(color.name);
-  const rgb = hexToRgb(color.hex);
+  const hex = color.value;
+  const rgb = hexToRgb(hex);
+  const textColor = getTextColor(hex);
+  const contrastBlack = getContrastRatio(hex, "#000000");
+  const contrastWhite = getContrastRatio(hex, "#ffffff");
 
-  // Contrast calculations first to determine text color
-  const contrastWhite = getContrastRatio(color.hex, "#ffffff");
-  const contrastBlack = getContrastRatio(color.hex, "#000000");
+  const values = [
+    { label: "HEX", value: hex.toUpperCase() },
+    { label: "OKLCH", value: hexToOklch(hex) },
+    { label: "RGB", value: `rgb(${rgb.r} ${rgb.g} ${rgb.b})` },
+  ];
 
-  // Choose the text color with the highest contrast
-  const textColor = contrastBlack > contrastWhite ? "#000000" : "#ffffff";
+  const valueRows = values
+    .map(
+      ({ label, value }) => `
+        <div class="color-value-row">
+          <span class="color-value-label" lang="en">${label}</span>
+          <span class="color-value-text">${value}</span>
+          <button type="button" class="copy-btn" data-value="${value}" aria-label="Copier la valeur ${label}">Copier</button>
+        </div>`
+    )
+    .join("");
 
-  const oklch = hexToOklch(color.hex);
+  const contrastTile = (label, text, ratio) => `
+    <div class="contrast-tile" style="--tile-text: ${text}; --tile-bg: ${
+    text === "#000000" ? "#ffffff" : "#2b0b22"
+  }">
+      <span class="contrast-tile-sample" aria-hidden="true">Aa</span>
+      <span class="contrast-tile-ratio">${label} · ${formatRatio(ratio)}</span>
+      <span class="contrast-tile-level">${getLevel(ratio)}</span>
+    </div>`;
 
-  const getGrade = (ratio) => {
-    if (ratio >= 7) return "AAA";
-    if (ratio >= 4.5) return "AA";
-    return "Fail";
-  };
-
-  const gradeWhite = getGrade(contrastWhite);
-  const gradeBlack = getGrade(contrastBlack);
-
-  const colorValues = `
-            <div class="color-value-row copy-trigger" data-value="${color.hex}" role="button" tabindex="0" title="Copier la valeur HEX">
-                <span class="text-subtle" lang="en">HEX</span>
-                <div style="display: flex; align-items: center; gap: var(--spacing-xs)">
-                    <span class="font-mono value-text">${color.hex}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="copy-icon" aria-hidden="true"><path fill="currentColor" d="M8 7h11v14H8z" opacity=".3"/><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z"/></svg>
-                    <span class="copy-feedback text-s" style="display:none">Copié !</span>
-                </div>
-            </div>
-            <div class="color-value-row copy-trigger" data-value="${oklch}" role="button" tabindex="0" title="Copier la valeur OKLCH">
-                <span class="text-subtle" lang="en">OKLCH</span>
-                <div style="display: flex; align-items: center; gap: var(--spacing-xs)">
-                    <span class="font-mono value-text">${oklch}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="copy-icon" aria-hidden="true"><path fill="currentColor" d="M8 7h11v14H8z" opacity=".3"/><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z"/></svg>
-                    <span class="copy-feedback text-s" style="display:none">Copié !</span>
-                </div>
-            </div>
-        `;
-
-  const a11ySection = `
-        <div class="a11y-section" data-layout="stack" data-gap="xs">
-            <div class="color-value-row">
-                <span class="text-subtle">Contraste sur Blanc</span>
-                <div class="contrast-wrapper">
-                    <span class="font-mono font-bold">${contrastWhite.toFixed(
-                      2
-                    )}</span>
-                    <span class="badge ${
-                      gradeWhite === "Fail" ? "badge-fail" : "badge-pass"
-                    }" lang="en">${gradeWhite}</span>
-                </div>
-            </div>
-            <div class="color-value-row">
-                <span class="text-subtle">Contraste sur Noir</span>
-                <div class="contrast-wrapper">
-                    <span class="font-mono font-bold">${contrastBlack.toFixed(
-                      2
-                    )}</span>
-                    <span class="badge ${
-                      gradeBlack === "Fail" ? "badge-fail" : "badge-pass"
-                    }" lang="en">${gradeBlack}</span>
-                </div>
-            </div>
-        </div>
+  selectedColorDisplay.style.setProperty("--swatch", color.hex);
+  selectedColorDisplay.style.setProperty("--on-swatch", textColor);
+  selectedColorDisplay.innerHTML = `
+    <div class="color-sheet-preview">
+      <div class="color-sheet-top">
+        <span class="color-sheet-tag">Couleur sélectionnée</span>
+        <button type="button" class="fav-btn" id="toggle-fav-btn"></button>
+      </div>
+      <div class="color-sheet-name" style="--name-len: ${color.name.length}">
+        <h2>${color.name}</h2>
+        <span>${hex.toUpperCase()}</span>
+      </div>
+    </div>
+    <div class="color-sheet-info">
+      <p class="color-funfact">${getColorFunFact(color.name)}</p>
+      <div class="color-values">${valueRows}</div>
+      <div class="contrast-tiles">
+        ${contrastTile("Texte noir", "#000000", contrastBlack)}
+        ${contrastTile("Texte blanc", "#ffffff", contrastWhite)}
+      </div>
+    </div>
   `;
 
-  selectedColorDisplay.innerHTML = `
-        <div class="color-preview-large" style="background-color: ${
-          color.hex
-        }; color: ${textColor}">
-            <h2 class="title-l color-preview-title">${color.name}</h2>
-        </div>
-        <div class="color-info">
-            <p class="color-funfact">${getColorFunFact(color.name)}</p>
-            ${colorValues}
-            ${a11ySection}
-
-            <button id="toggle-fav-btn" class="btn btn-outline" data-gap="xs">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M22 9.67a1 1 0 0 0-.86-.67l-5.69-.83L12.9 3a1 1 0 0 0-1.8 0L8.55 8.16L2.86 9a1 1 0 0 0-.81.68a1 1 0 0 0 .25 1l4.13 4l-1 5.68a1 1 0 0 0 1.47 1.08l5.1-2.67l5.1 2.67a.93.93 0 0 0 .46.12a1 1 0 0 0 .59-.19a1 1 0 0 0 .4-1l-1-5.68l4.13-4A1 1 0 0 0 22 9.67m-6.15 4a1 1 0 0 0-.29.88l.72 4.2l-3.76-2a1.06 1.06 0 0 0-.94 0l-3.76 2l.72-4.2a1 1 0 0 0-.29-.88l-3-3l4.21-.61a1 1 0 0 0 .76-.55L12 5.7l1.88 3.82a1 1 0 0 0 .76.55l4.21.61Z"/></svg>
-                ${isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
-            </button>
-        </div>
-    `;
-
-  document.getElementById("toggle-fav-btn").addEventListener("click", () => {
+  const favBtn = document.getElementById("toggle-fav-btn");
+  updateFavButton(favBtn, color);
+  favBtn.addEventListener("click", () => {
     toggleFavorite(color.name);
-    renderSelectedColor(color); // Re-render to update button text
+    updateFavButton(favBtn, color);
+    favBtn.classList.remove("is-popping");
+    // Force reflow to replay the animation
+    void favBtn.offsetWidth;
+    favBtn.classList.add("is-popping");
   });
 
-  // Add copy event listeners
-  document.querySelectorAll(".copy-trigger").forEach((el) => {
-    el.addEventListener("click", async () => {
-      const value = el.dataset.value;
-      try {
-        await navigator.clipboard.writeText(value);
-        const feedback = el.querySelector(".copy-feedback");
-        feedback.style.display = "inline";
-        setTimeout(() => {
-          feedback.style.display = "none";
-        }, 2000);
-      } catch (err) {
-        console.error("Failed to copy!", err);
-      }
-    });
-    // Add keyboard support for copy
-    el.addEventListener("keydown", async (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        el.click();
-      }
-    });
+  selectedColorDisplay.querySelectorAll(".copy-btn").forEach((btn) => {
+    btn.addEventListener("click", () => copyValue(btn.dataset.value));
   });
 }
 
-function getComplementaryColor(targetColor) {
-  // If grayscale, no complementary
-  if (targetColor.hsl.s < 5) return null;
+function updateFavButton(button, color) {
+  const isFav = favorites.includes(color.name);
+  const label = isFav ? "Retirer des favoris" : "Ajouter aux favoris";
+  button.setAttribute("aria-pressed", String(isFav));
+  button.setAttribute("aria-label", label);
+  button.title = label;
+  button.innerHTML = `<span aria-hidden="true">${isFav ? "★" : "☆"}</span>`;
+}
 
-  const targetHue = (targetColor.hsl.h + 180) % 360;
+async function copyValue(value) {
+  try {
+    await navigator.clipboard.writeText(value);
+    showToast(`✓ ${value} copié !`);
+  } catch (err) {
+    console.error("Failed to copy!", err);
+  }
+}
 
-  let best = null;
-  let minDistance = Infinity;
-
-  colorsWithHsl.forEach((c) => {
-    // Calculate distance to the ideal complementary point
-    // We prioritize Hue accuracy, then Saturation/Lightness similarity
-
-    let hDiff = Math.abs(c.hsl.h - targetHue);
-    if (hDiff > 180) hDiff = 360 - hDiff;
-
-    const sDiff = Math.abs(c.hsl.s - targetColor.hsl.s);
-    const lDiff = Math.abs(c.hsl.l - targetColor.hsl.l);
-
-    // Weighted distance
-    // Hue is most important for "Complementary" definition
-    const distance = hDiff * 2 + sDiff * 0.5 + lDiff * 0.5;
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      best = c;
-    }
-  });
-
-  return best;
+let toastTimer;
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.remove("is-visible");
+  void toast.offsetWidth;
+  toast.classList.add("is-visible");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 1900);
 }
 
 function renderNearbyColors(targetColor) {
-  // Sort by distance in HSL space
-  // Simple distance: weighted euclidean on H, S, L
-  // We want colors that "look" close.
-  // Let's try sorting by Hue distance first.
-
-  const sorted = [...colorsWithHsl]
-    // Exclude system colors
-    .filter((c) => !c.system)
-    .sort((a, b) => {
-      const distA = getColorDistance(targetColor, a);
-      const distB = getColorDistance(targetColor, b);
-      return distA - distB;
-    });
-
-  // Take top 12 excluding self
-  const nearby = sorted.filter((c) => c.name !== targetColor.name).slice(0, 12);
+  const nearby = getNearbyColors(targetColor, 12);
 
   // Sort by lightness for better display
   nearby.sort((a, b) => b.hsl.l - a.hsl.l);
 
-  nearbyColorsContainer.innerHTML = "";
-  nearby.forEach((c) => {
-    const card = createColorCard(c);
-    nearbyColorsContainer.appendChild(card);
-  });
+  renderList({ title: "Couleurs proches", colors: nearby });
+}
+
+function getNearbyColors(targetColor, count) {
+  return colorsWithHsl
+    .filter((c) => !c.system && c.name !== targetColor.name)
+    .sort(
+      (a, b) =>
+        getColorDistance(targetColor, a) - getColorDistance(targetColor, b)
+    )
+    .slice(0, count);
 }
 
 function getColorDistance(c1, c2) {
@@ -574,10 +601,9 @@ function getColorDistance(c1, c2) {
 
   // If one is gray and the other isn't, they're far apart
   if (isGray1 !== isGray2) {
-    return 1000; // Large distance to separate grays from colors
+    return 1000;
   }
 
-  // For colored items, use hue, saturation, and lightness
   // Hue is circular (0-360)
   let hDiff = Math.abs(c1.hsl.h - c2.hsl.h);
   if (hDiff > 180) hDiff = 360 - hDiff;
@@ -590,58 +616,9 @@ function getColorDistance(c1, c2) {
   );
 }
 
-function getLuminance(r, g, b) {
-  const a = [r, g, b].map((v) => {
-    v /= 255;
-    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-  });
-  return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
-}
-
-function getContrastRatio(hex1, hex2) {
-  const rgb1 = hexToRgb(hex1);
-  const rgb2 = hexToRgb(hex2);
-  const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
-  const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
-  const brightest = Math.max(lum1, lum2);
-  const darkest = Math.min(lum1, lum2);
-  return (brightest + 0.05) / (darkest + 0.05);
-}
-
-function createColorCard(color) {
-  const div = document.createElement("div");
-  div.className = "color-card";
-  div.setAttribute("tabindex", "0");
-  div.setAttribute("role", "button");
-  div.setAttribute("aria-label", `Sélectionner la couleur ${color.name}`);
-  div.innerHTML = `
-        <div class="card-preview" style="background-color: ${color.hex}"></div>
-        <div class="card-info">
-            <span class="text-s font-bold">${color.name}</span>
-        </div>
-    `;
-
-  // Fonction pour sélectionner la couleur et réinitialiser la recherche
-  const handleSelect = () => {
-    searchInput.value = "";
-    suggestionsList.hidden = true;
-    selectColor(color);
-  };
-
-  // Gestion du clic
-  div.addEventListener("click", handleSelect);
-
-  // Gestion du clavier (Enter et Space)
-  div.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleSelect();
-    }
-  });
-
-  return div;
-}
-
+/* ----------------------------------
+ * Favoris
+ * ---------------------------------- */
 function toggleFavorite(colorName) {
   if (favorites.includes(colorName)) {
     favorites = favorites.filter((f) => f !== colorName);
@@ -654,147 +631,128 @@ function toggleFavorite(colorName) {
 
 function renderFavorites() {
   favoritesList.innerHTML = "";
-  if (favorites.length === 0) {
+  const favColors = favorites.map(findColor).filter(Boolean);
+
+  if (favColors.length === 0) {
     favoritesList.innerHTML =
       '<p class="empty-state">Aucun favori pour le moment.</p>';
     return;
   }
 
-  favorites.forEach((name) => {
-    const color = colorsWithHsl.find((c) => c.name === name);
-    if (color) {
-      favoritesList.appendChild(createColorCard(color));
-    }
+  favColors.forEach((color) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "fav-item";
+    button.setAttribute("aria-label", `Sélectionner la couleur ${color.name}`);
+    button.innerHTML = `
+      <span class="fav-item-swatch" style="--swatch: ${color.hex}"></span>
+      <span class="fav-item-name">${color.name}</span>
+    `;
+    button.addEventListener("click", () =>
+      selectColor(color, { scroll: true })
+    );
+    favoritesList.appendChild(button);
   });
 }
 
+/* ----------------------------------
+ * Palettes
+ * ---------------------------------- */
 function renderPalettes() {
   palettesList.innerHTML = "";
   palettes.forEach((palette) => {
-    const card = createPaletteCard(palette);
-    palettesList.appendChild(card);
+    palettesList.appendChild(createPaletteCard(palette));
   });
 }
 
 function createPaletteCard(palette) {
-  const div = document.createElement("div");
-  div.className = "palette-card";
-  div.setAttribute("tabindex", "0");
-  div.setAttribute("role", "button");
-  div.setAttribute("aria-label", `Charger la palette ${palette.name}`);
+  const card = document.createElement("div");
+  card.className = "palette-card";
 
-  const stripes = palette.colors
-    .map((colorName) => {
-      const color = colorsWithHsl.find((c) => c.name === colorName);
-      const hex = color ? color.hex : colorName;
-      return `<div class="palette-stripe" style="background-color: ${hex}" title="${colorName}"></div>`;
-    })
-    .join("");
+  const stripes = document.createElement("div");
+  stripes.className = "palette-stripes";
 
-  div.innerHTML = `
-        <div class="palette-preview">
-            ${stripes}
-        </div>
-        <div class="palette-info">
-            <span class="text-s font-bold">${palette.name}</span>
-            <span class="text-s text-subtle" style="font-size: 0.8em">${palette.colors.length} couleurs</span>
-        </div>
-    `;
-
-  div.addEventListener("click", () => loadPalette(palette));
-  div.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      loadPalette(palette);
-    }
+  palette.colors.forEach((colorName) => {
+    const color = findColor(colorName);
+    if (!color) return;
+    const stripe = document.createElement("button");
+    stripe.type = "button";
+    stripe.className = "palette-stripe";
+    stripe.title = color.name;
+    stripe.setAttribute("aria-label", `Sélectionner la couleur ${color.name}`);
+    stripe.style.setProperty("--swatch", color.hex);
+    stripe.style.setProperty("--on-swatch", getTextColor(color.value));
+    stripe.innerHTML = `<span aria-hidden="true">${color.name}</span>`;
+    stripe.addEventListener("click", () =>
+      selectColor(color, { scroll: true })
+    );
+    stripes.appendChild(stripe);
   });
 
-  return div;
+  const name = document.createElement("button");
+  name.type = "button";
+  name.className = "palette-name";
+  name.textContent = palette.name;
+  name.setAttribute("aria-label", `Afficher la palette ${palette.name}`);
+  name.addEventListener("click", () => loadPalette(palette));
+
+  card.append(stripes, name);
+  return card;
 }
 
 function loadPalette(palette) {
-  // Clear selected color display
-  selectedColorDisplay.innerHTML = "";
-  selectedColorDisplay.style.display = "none";
-
-  // Update title
-  const container = nearbyColorsContainer.parentElement;
-  const title = container.querySelector("h2");
-  title.textContent = `Palette : ${palette.name}`;
-
-  // Update page title
+  resetFilters();
   document.title = `Hotpink - Palette ${palette.name}`;
 
-  // Description
-  filterDescription.textContent = `Couleurs : ${palette.colors.join(", ")}`;
-  filterDescription.style.display = "block";
-
-  nearbyColorsContainer.innerHTML = "";
-
-  palette.colors.forEach((colorName) => {
-    const color = colorsWithHsl.find((c) => c.name === colorName);
-    if (color) {
-      nearbyColorsContainer.appendChild(createColorCard(color));
-    }
+  renderList({
+    title: `Palette : ${palette.name}`,
+    description: `Couleurs : ${palette.colors.join(", ")}`,
+    colors: palette.colors.map(findColor).filter(Boolean),
   });
 
-  resultsSection.hidden = false;
-  resultsSection.scrollIntoView({ behavior: "smooth" });
+  nearbyColorsContainer.parentElement.scrollIntoView({
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+  });
 }
 
-// Image Upload Handler
+/* ----------------------------------
+ * Couleur depuis une image
+ * ---------------------------------- */
+let imageObjectUrl = null;
+
 function handleImageUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Reset other inputs
   searchInput.value = "";
-  suggestionsList.hidden = true;
-  specialFilterSelect.value = "";
+  closeSuggestions();
 
-  const reader = new FileReader();
+  if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
+  imageObjectUrl = URL.createObjectURL(file);
 
-  reader.onload = function (event) {
-    const img = new Image();
+  const img = new Image();
+  img.onload = () => {
+    const dominantColor = getDominantColor(img);
+    const closestColor = findClosestNamedColor(dominantColor);
 
-    img.onload = function () {
-      // Extract dominant color
-      const dominantColor = getDominantColor(img);
+    imageThumb.src = imageObjectUrl;
+    imageHex.textContent = dominantColor.hex.toUpperCase();
+    imageNear.textContent = closestColor.name;
+    imageResult.hidden = false;
 
-      // Display the image on canvas
-      const ctx = imageCanvas.getContext("2d");
-      const maxWidth = 300;
-      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
-      imageCanvas.width = img.width * ratio;
-      imageCanvas.height = img.height * ratio;
-      ctx.drawImage(img, 0, 0, imageCanvas.width, imageCanvas.height);
-      imageCanvas.hidden = false;
-
-      // Find closest named color
-      const closestColor = findClosestNamedColor(dominantColor);
-
-      // Update page title
-      document.title = `Hotpink - Couleur depuis image`;
-
-      // Display results
-      renderImageColorResults(dominantColor, closestColor);
-    };
-
-    img.src = event.target.result;
+    selectColor(closestColor, { scroll: true });
   };
-
-  reader.readAsDataURL(file);
+  img.src = imageObjectUrl;
 }
 
 function findClosestNamedColor(rgb) {
-  const targetHsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-  const targetColor = { hsl: targetHsl };
+  const targetColor = { hsl: rgbToHsl(rgb.r, rgb.g, rgb.b) };
 
   let closest = null;
   let minDistance = Infinity;
 
   colorsWithHsl.forEach((color) => {
-    if (color.system) return; // Skip system colors
+    if (color.system) return;
 
     const distance = getColorDistance(targetColor, color);
     if (distance < minDistance) {
@@ -804,52 +762,6 @@ function findClosestNamedColor(rgb) {
   });
 
   return closest;
-}
-
-function renderImageColorResults(dominantColor, closestColor) {
-  // Hide selected color display
-  selectedColorDisplay.innerHTML = "";
-  selectedColorDisplay.style.display = "none";
-
-  // Update title
-  const container = nearbyColorsContainer.parentElement;
-  const title = container.querySelector("h2");
-  title.textContent = `Couleur extraite de l'image`;
-
-  // Show description with dominant color info
-  filterDescription.innerHTML = `
-    <div style="display: flex; align-items: center; gap: var(--spacing-s);">
-      <div style="width: 3rem; height: 3rem; background-color: ${dominantColor.hex}; border-radius: var(--radius-8); border: 1px solid var(--border-light);"></div>
-      <div>
-        <strong>Couleur dominante extraite :</strong> ${dominantColor.hex}<br>
-        <strong>Couleur nommée la plus proche :</strong> ${closestColor.name}
-      </div>
-    </div>
-  `;
-  filterDescription.style.display = "block";
-
-  // Display the closest color and similar colors
-  nearbyColorsContainer.innerHTML = "";
-
-  // Add the closest color first
-  nearbyColorsContainer.appendChild(createColorCard(closestColor));
-
-  // Add nearby colors
-  const sorted = [...colorsWithHsl]
-    .filter((c) => !c.system && c.name !== closestColor.name)
-    .sort((a, b) => {
-      const distA = getColorDistance(closestColor, a);
-      const distB = getColorDistance(closestColor, b);
-      return distA - distB;
-    })
-    .slice(0, 11);
-
-  sorted.forEach((c) => {
-    nearbyColorsContainer.appendChild(createColorCard(c));
-  });
-
-  resultsSection.hidden = false;
-  resultsSection.scrollIntoView({ behavior: "smooth" });
 }
 
 // Run
