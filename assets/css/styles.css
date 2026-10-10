@@ -197,6 +197,42 @@ button {
 }
 
 /* ----------------------------------
+ * Liens d'évitement
+ * ---------------------------------- */
+.skiplinks {
+  position: absolute;
+  z-index: 100;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    position: absolute;
+    padding: var(--spacing-12) var(--spacing-16);
+    border: var(--sticker-border);
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+    translate: 0 -200%;
+
+    &:focus {
+      translate: 0 0;
+    }
+  }
+}
+
+main:focus,
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* ----------------------------------
  * Bandeau défilant
  * ---------------------------------- */
 .marquee {

@@ -29,6 +29,15 @@
     <script type="module" src="assets/js/app.js" defer></script>
   </head>
   <body>
+    <nav class="skiplinks" aria-label="Liens d'évitement">
+      <ul>
+        <li><a href="#main-content">Aller au contenu principal</a></li>
+        <li><a href="#color-search">Aller à la recherche</a></li>
+        <li><a href="#favorites-title">Aller aux favoris</a></li>
+        <li><a href="#palettes-section">Aller aux palettes</a></li>
+      </ul>
+    </nav>
+
     <div class="marquee" aria-hidden="true">
       <div class="marquee-track" id="marquee-track"></div>
     </div>
@@ -52,14 +61,14 @@
           Jouer&#8239;! 🎮
         </button>
       </div>
-      <span class="floating-sticker floating-sticker-papaya" aria-hidden="true"
+      <!-- <span class="floating-sticker floating-sticker-papaya" aria-hidden="true"
         >papayawhip</span
-      >
+      > -->
       <span class="floating-sticker floating-sticker-purple" aria-hidden="true"></span>
       <span class="floating-sticker floating-sticker-turquoise" aria-hidden="true"></span>
     </header>
 
-    <main class="main">
+    <main class="main" id="main-content" tabindex="-1">
       <!-- Recherche -->
       <section class="search-panel" aria-label="Recherche">
         <div class="search-wrapper">
@@ -198,14 +207,14 @@
         class="favorites-section"
         aria-labelledby="favorites-title"
       >
-        <h2 id="favorites-title" class="section-title">Favoris 🌟</h2>
+        <h2 id="favorites-title" class="section-title" tabindex="-1">Favoris 🌟</h2>
         <div id="favorites-list" class="favorites-list">
           <p class="empty-state">Aucun favori pour le moment.</p>
         </div>
       </section>
 
       <!-- Palettes -->
-      <section id="palettes-section" class="palettes-section">
+      <section id="palettes-section" class="palettes-section" aria-label="Palettes" tabindex="-1">
         <details class="palettes-details" open>
           <summary class="palettes-summary">
             <h2 class="section-title">Palettes d'inspiration ✨</h2>

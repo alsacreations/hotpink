@@ -200,6 +200,28 @@ function renderMarquee() {
     )
     .join("");
   marqueeTrack.innerHTML = items;
+  stopMarqueeSmoothly();
+}
+
+/* Ralentit puis arrête le défilement après 3 secondes (WCAG 2.2.2) */
+function stopMarqueeSmoothly(delay = 3000, duration = 1500) {
+  const animation = marqueeTrack.getAnimations()[0];
+  if (!animation) return;
+
+  setTimeout(() => {
+    const start = performance.now();
+    const initialRate = animation.playbackRate;
+    const tick = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      animation.playbackRate = initialRate * (1 - progress * progress);
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        animation.pause();
+      }
+    };
+    requestAnimationFrame(tick);
+  }, delay);
 }
 
 /* ----------------------------------
@@ -414,7 +436,6 @@ function createColorCard(color) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "color-card";
-  button.setAttribute("aria-label", `Sélectionner la couleur ${color.name}`);
   button.innerHTML = `
     <span class="color-card-swatch" style="--swatch: ${color.hex}"></span>
     <span class="color-card-name">${color.name}</span>
@@ -643,7 +664,7 @@ function renderFavorites() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "fav-item";
-    button.setAttribute("aria-label", `Sélectionner la couleur ${color.name}`);
+    button.setAttribute("aria-label", `${color.name}, sélectionner la couleur`);
     button.innerHTML = `
       <span class="fav-item-swatch" style="--swatch: ${color.hex}"></span>
       <span class="fav-item-name">${color.name}</span>
@@ -679,7 +700,7 @@ function createPaletteCard(palette) {
     stripe.type = "button";
     stripe.className = "palette-stripe";
     stripe.title = color.name;
-    stripe.setAttribute("aria-label", `Sélectionner la couleur ${color.name}`);
+    stripe.setAttribute("aria-label", `${color.name}, sélectionner la couleur`);
     stripe.style.setProperty("--swatch", color.hex);
     stripe.style.setProperty("--on-swatch", getTextColor(color.value));
     stripe.innerHTML = `<span aria-hidden="true">${color.name}</span>`;
