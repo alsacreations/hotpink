@@ -1,14 +1,19 @@
 import { namedColors } from "./modules/colors.js";
+import { hexToRgb, rgbToHsl } from "./modules/utils.js";
 import {
-  hexToRgb,
-  rgbToHsl,
-  getContrastRatio,
-  hexToOklch,
-} from "./modules/utils.js";
+  colorCardInnerHtml,
+  colorPath,
+  colorSheetHtml,
+  colorSheetStyle,
+  colorTitle,
+  formatHex,
+  getTextColor,
+  getColorDistance,
+  getNearbyColors,
+} from "./modules/render.js";
 import { filterFunctions } from "./modules/filters.js";
 import { ColorQuiz } from "./modules/quiz.js";
 import { palettes } from "./modules/palettes.js";
-import { getColorFunFact } from "./modules/funfacts.js";
 import { getDominantColor } from "./modules/image-color.js";
 
 // DOM Elements
@@ -120,17 +125,31 @@ function init() {
   renderFavorites();
   renderPalettes();
 
-  // Check URL hash for initial color, "hotpink" by default
-  const hash = window.location.hash.slice(1);
+  // Couleur initiale : /red/ (page statique), ancien format #red, sinon "hotpink"
+  const fromPath = findColor(getPathColorName());
+  const fromHash = findColor(window.location.hash.slice(1));
   const initial =
-    findColor(hash) || colorsWithHsl.find((c) => c.name === "hotpink");
-  if (initial) selectColor(initial, { updateHistory: Boolean(hash) });
+    fromPath ||
+    fromHash ||
+    colorsWithHsl.find((c) => c.name === "hotpink");
+  if (initial) {
+    selectColor(initial, { updateHistory: false });
+    // Ancien format #red : on bascule vers /red/
+    if (!fromPath && fromHash) {
+      window.history.replaceState({}, "", colorPath(initial));
+    }
+  }
 
   // Initialize quiz
   const quiz = new ColorQuiz(colorsWithHsl);
   document
     .getElementById("quiz-btn")
     .addEventListener("click", () => quiz.open());
+}
+
+/** Nom de couleur lu dans l'URL : /red/ → "red" */
+function getPathColorName() {
+  return decodeURIComponent(window.location.pathname.split("/")[1] || "");
 }
 
 function findColor(name) {
@@ -160,12 +179,6 @@ function resolveSystemColor(keyword) {
   );
 }
 
-function getTextColor(hex) {
-  return getContrastRatio(hex, "#000000") >= getContrastRatio(hex, "#ffffff")
-    ? "#1a0714"
-    : "#ffffff";
-}
-
 function setupEventListeners() {
   searchInput.addEventListener("input", handleSearchInput);
   searchInput.addEventListener("keydown", handleKeyDown);
@@ -184,7 +197,7 @@ function setupEventListeners() {
 
   // Handle browser back/forward navigation
   window.addEventListener("popstate", () => {
-    const color = findColor(window.location.hash.slice(1));
+    const color = findColor(getPathColorName());
     if (color) selectColor(color, { updateHistory: false });
   });
 }
@@ -339,10 +352,6 @@ function pickSuggestion(color) {
   selectColor(color, { scroll: true });
 }
 
-function formatHex(color) {
-  return color.system ? color.value.toUpperCase() : color.hex.toUpperCase();
-}
-
 /* ----------------------------------
  * Filtres (teinte et filtres originaux)
  * ---------------------------------- */
@@ -433,20 +442,21 @@ function renderList({ title, description = "", colors, emptyText = "" }) {
 }
 
 function createColorCard(color) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "color-card";
-  button.innerHTML = `
-    <span class="color-card-swatch" style="--swatch: ${color.hex}"></span>
-    <span class="color-card-name">${color.name}</span>
-    <span class="color-card-hex">${formatHex(color)}</span>
-  `;
-  button.addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.className = "color-card";
+  link.href = colorPath(color);
+  link.innerHTML = colorCardInnerHtml(color);
+  link.addEventListener("click", (e) => {
+    // Laisse le navigateur gérer ouverture dans un nouvel onglet, etc.
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+      return;
+    }
+    e.preventDefault();
     searchInput.value = "";
     closeSuggestions();
     selectColor(color, { scroll: true });
   });
-  return button;
+  return link;
 }
 
 /* ----------------------------------
@@ -455,10 +465,10 @@ function createColorCard(color) {
 function selectColor(color, { updateHistory = true, scroll = false } = {}) {
   currentColor = color;
 
-  if (updateHistory && window.location.hash.slice(1) !== color.name) {
-    window.history.pushState({}, "", `#${color.name}`);
+  if (updateHistory && getPathColorName() !== color.name) {
+    window.history.pushState({}, "", colorPath(color));
   }
-  document.title = `Hotpink - couleur ${color.name}`;
+  document.title = colorTitle(color);
 
   // Update slider position
   if (!color.system) {
@@ -478,72 +488,9 @@ function selectColor(color, { updateHistory = true, scroll = false } = {}) {
   }
 }
 
-function getLevel(ratio) {
-  if (ratio >= 7) return "Contraste OK AAA";
-  if (ratio >= 4.5) return "AA";
-  if (ratio >= 3) return "AA grand texte";
-  return "Contraste insuffisant";
-}
-
-function formatRatio(ratio) {
-  return `${ratio.toFixed(2).replace(".", ",")}:1`;
-}
-
 function renderSelectedColor(color) {
-  const hex = color.value;
-  const rgb = hexToRgb(hex);
-  const textColor = getTextColor(hex);
-  const contrastBlack = getContrastRatio(hex, "#000000");
-  const contrastWhite = getContrastRatio(hex, "#ffffff");
-
-  const values = [
-    { label: "HEX", value: hex.toUpperCase() },
-    { label: "OKLCH", value: hexToOklch(hex) },
-    { label: "RGB", value: `rgb(${rgb.r} ${rgb.g} ${rgb.b})` },
-  ];
-
-  const valueRows = values
-    .map(
-      ({ label, value }) => `
-        <div class="color-value-row">
-          <span class="color-value-label" lang="en">${label}</span>
-          <span class="color-value-text">${value}</span>
-          <button type="button" class="copy-btn" data-value="${value}" aria-label="Copier la valeur ${label}">Copier</button>
-        </div>`
-    )
-    .join("");
-
-  const contrastTile = (label, text, ratio) => `
-    <div class="contrast-tile" style="--tile-text: ${text}; --tile-bg: ${
-    text === "#000000" ? "#ffffff" : "#2b0b22"
-  }">
-      <span class="contrast-tile-sample" aria-hidden="true">Aa</span>
-      <span class="contrast-tile-ratio">${label} · ${formatRatio(ratio)}</span>
-      <span class="contrast-tile-level">${getLevel(ratio)}</span>
-    </div>`;
-
-  selectedColorDisplay.style.setProperty("--swatch", color.hex);
-  selectedColorDisplay.style.setProperty("--on-swatch", textColor);
-  selectedColorDisplay.innerHTML = `
-    <div class="color-sheet-preview">
-      <div class="color-sheet-top">
-        <span class="color-sheet-tag">Couleur sélectionnée</span>
-        <button type="button" class="fav-btn" id="toggle-fav-btn"></button>
-      </div>
-      <div class="color-sheet-name" style="--name-len: ${color.name.length}">
-        <h2>${color.name}</h2>
-        <span>${hex.toUpperCase()}</span>
-      </div>
-    </div>
-    <div class="color-sheet-info">
-      <p class="color-funfact">${getColorFunFact(color.name)}</p>
-      <div class="color-values">${valueRows}</div>
-      <div class="contrast-tiles">
-        ${contrastTile("Texte noir", "#000000", contrastBlack)}
-        ${contrastTile("Texte blanc", "#ffffff", contrastWhite)}
-      </div>
-    </div>
-  `;
+  selectedColorDisplay.setAttribute("style", colorSheetStyle(color));
+  selectedColorDisplay.innerHTML = colorSheetHtml(color);
 
   const favBtn = document.getElementById("toggle-fav-btn");
   updateFavButton(favBtn, color);
@@ -590,51 +537,9 @@ function showToast(message) {
 }
 
 function renderNearbyColors(targetColor) {
-  const nearby = getNearbyColors(targetColor, 12);
-
-  // Sort by lightness for better display
-  nearby.sort((a, b) => b.hsl.l - a.hsl.l);
+  const nearby = getNearbyColors(targetColor, colorsWithHsl, 12);
 
   renderList({ title: "Couleurs proches", colors: nearby });
-}
-
-function getNearbyColors(targetColor, count) {
-  return colorsWithHsl
-    .filter((c) => !c.system && c.name !== targetColor.name)
-    .sort(
-      (a, b) =>
-        getColorDistance(targetColor, a) - getColorDistance(targetColor, b)
-    )
-    .slice(0, count);
-}
-
-function getColorDistance(c1, c2) {
-  // For grays (low saturation), ignore hue and focus on lightness
-  const isGray1 = c1.hsl.s < 10;
-  const isGray2 = c2.hsl.s < 10;
-
-  // If both are grays, only compare saturation and lightness
-  if (isGray1 && isGray2) {
-    return Math.sqrt(
-      Math.pow(c1.hsl.s - c2.hsl.s, 2) + Math.pow(c1.hsl.l - c2.hsl.l, 2)
-    );
-  }
-
-  // If one is gray and the other isn't, they're far apart
-  if (isGray1 !== isGray2) {
-    return 1000;
-  }
-
-  // Hue is circular (0-360)
-  let hDiff = Math.abs(c1.hsl.h - c2.hsl.h);
-  if (hDiff > 180) hDiff = 360 - hDiff;
-
-  // Weight hue more heavily for colored items
-  return Math.sqrt(
-    Math.pow(hDiff * 2, 2) +
-      Math.pow(c1.hsl.s - c2.hsl.s, 2) +
-      Math.pow(c1.hsl.l - c2.hsl.l, 2)
-  );
 }
 
 /* ----------------------------------

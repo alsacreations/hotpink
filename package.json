@@ -1,0 +1,11 @@
+{
+  "name": "hotpink",
+  "private": true,
+  "type": "module",
+  "description": "Les couleurs nommées du Web et leur histoire",
+  "scripts": {
+    "dev": "npx vite",
+    "build": "node scripts/build.mjs",
+    "preview": "npx vite preview --outDir dist"
+  }
+}

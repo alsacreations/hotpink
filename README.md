@@ -40,6 +40,23 @@ Historiquement au nombre de 16 couleurs en CSS1, la liste a été enrichie au fi
 - Vous pouvez copier facilement les codes couleur affichés pour les utiliser dans vos projets
 - L'outil fonctionne entièrement dans votre navigateur, aucune connexion internet n'est nécessaire après le premier chargement
 
+## 🛠️ Développement et pages statiques
+
+Chaque couleur nommée dispose de sa propre URL, directement à la racine : `/red/`, `/hotpink/`, `/rebeccapurple/`… Ces 148 pages sont générées au build (contenu pré-rendu, `title` et meta description propres, balises Open Graph, données structurées JSON-LD, URL canonique) afin d'être indexables par les moteurs de recherche. Un `sitemap.xml` et un `robots.txt` sont également produits.
+
+```bash
+npm run dev       # serveur de développement (Vite, sans build)
+npm run build     # génère le site complet dans dist/
+npm run preview   # sert dist/ pour vérifier le résultat
+```
+
+- Le script de génération est [scripts/build.mjs](scripts/build.mjs) : il utilise `index.html` comme gabarit et ne nécessite aucune dépendance (Node.js uniquement).
+- Le rendu HTML de la fiche couleur et des couleurs proches est partagé entre le navigateur et le build dans [assets/js/modules/render.js](assets/js/modules/render.js) (module sans accès au DOM).
+- Au chargement, `app.js` lit la couleur dans l'URL (`/red/`) et la sélection d'une couleur met à jour l'URL via l'API History. Les anciens liens `#red` sont redirigés vers `/red/`.
+- **Déploiement** : le workflow [.github/workflows/deploy.yml](.github/workflows/deploy.yml) lance `npm run build` à chaque push sur `main` et publie `dist/` sur GitHub Pages (`hotpink.alsacreations.com`). Le dossier `dist/` n'est pas versionné. Dans les réglages du dépôt, *Pages → Source* doit être sur **GitHub Actions**.
+- En développement (`npm run dev`), les URLs `/red/` fonctionnent grâce au fallback SPA de Vite ; seul `npm run build` produit les vraies pages statiques.
+- Le domaine du site est défini par `SITE_URL` dans `scripts/build.mjs` (à garder cohérent avec `CNAME`).
+
 ## 🔗 Liens utiles
 
 - [Voir toutes les couleurs CSS triées](https://enes.in/sorted-colors/)

@@ -1125,6 +1125,7 @@ main:focus,
   box-shadow: var(--shadow-s);
   color: var(--ink);
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   rotate: var(--tilt);
 
