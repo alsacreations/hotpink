@@ -6,12 +6,19 @@ import {
   colorSheetHtml,
   colorSheetStyle,
   colorTitle,
+  filterDescription as getFilterDescription,
+  filterHeading,
+  filterPageTitle,
+  filterPath,
+  findFilterBySlug,
   formatHex,
+  getFilterColors,
   getTextColor,
+  pluralize,
   getColorDistance,
   getNearbyColors,
 } from "./modules/render.js";
-import { filterFunctions } from "./modules/filters.js";
+import { FILTER_SLUGS, PAGE_TITLES, filterFunctions } from "./modules/filters.js";
 import { ColorQuiz } from "./modules/quiz.js";
 import { palettes } from "./modules/palettes.js";
 import { getDominantColor } from "./modules/image-color.js";
@@ -20,7 +27,7 @@ import { getDominantColor } from "./modules/image-color.js";
 const searchInput = document.getElementById("color-search");
 const suggestionsList = document.getElementById("search-suggestions");
 const selectedColorDisplay = document.getElementById("selected-color-display");
-const resultsTitle = document.getElementById("results-title");
+let resultsTitle = document.getElementById("results-title");
 const nearbyColorsContainer = document.getElementById("nearby-colors");
 const favoritesList = document.getElementById("favorites-list");
 const palettesList = document.getElementById("palettes-list");
@@ -53,54 +60,10 @@ const MARQUEE_COLORS = [
   "cornflowerblue",
 ];
 
-const FILTER_TITLES = {
-  "all-lightness": "Toutes les couleurs (par luminosité) ☀️",
-  historical: "Couleurs historiques 🕰️",
-  pastel: "Couleurs pastel 🍬",
-  vintage: "Couleurs vintage 📻",
-  grays: "Niveaux de gris 🐘",
-  edible: "Couleurs comestibles 😋",
-  plants: "Plantes & Fleurs 🌸",
-  minerals: "Minéraux & Pierres 💎",
-  system: "Couleurs système 🖥️",
-};
-
-const FILTER_DESCRIPTIONS = {
-  "all-lightness":
-    "L'ensemble des 148 couleurs CSS nommées (147 de CSS3 + rebeccapurple ajoutée en CSS4), hors couleurs système, triées de la plus claire à la plus sombre.",
-  historical:
-    "Les 16 couleurs originelles du HTML, héritées du système VGA. Elles sont supportées par tous les navigateurs depuis toujours.",
-  pastel:
-    "Couleurs douces et claires, parfaites pour créer des interfaces délicates et apaisantes.",
-  vintage:
-    "Palette de couleurs chaudes et terreuses évoquant les années 50 à 70, pour un aspect rétro et nostalgique.",
-  grays:
-    "Toutes les nuances de gris disponibles en CSS, du noir au blanc. Essentielles pour les hiérarchies visuelles.",
-  edible:
-    "Couleurs inspirées par la nourriture et les boissons. De quoi donner faim en codant !",
-  plants:
-    "Couleurs évoquant la nature, les fleurs et les plantes. Apportez une touche végétale à vos interfaces.",
-  minerals:
-    "Couleurs inspirées par les pierres précieuses et les minéraux. Pour des designs qui brillent !",
-  system:
-    "Couleurs système qui s'adaptent automatiquement au thème de l'utilisateur (clair/sombre). Leur rendu dépend du navigateur.",
-};
-
-const PAGE_TITLES = {
-  "all-lightness": "Toutes les couleurs",
-  historical: "Couleurs historiques",
-  pastel: "Couleurs pastel",
-  vintage: "Couleurs vintage",
-  grays: "Niveaux de gris",
-  edible: "Couleurs comestibles",
-  plants: "Plantes & Fleurs",
-  minerals: "Minéraux & Pierres",
-  system: "Couleurs système",
-};
-
 // State
 let colorsWithHsl = [];
 let currentColor = null;
+let pageMode = "home"; // "home" | "color" | "filter"
 let favorites =
   JSON.parse(localStorage.getItem("color-finder-favorites")) || [];
 
@@ -125,19 +88,23 @@ function init() {
   renderFavorites();
   renderPalettes();
 
-  // Couleur initiale : /red/ (page statique), ancien format #red, sinon "hotpink"
-  const fromPath = findColor(getPathColorName());
+  // Page initiale : /red/ (couleur), /couleurs-pastel/ (filtre), ancien
+  // format #red (redirigé vers /red/), sinon "hotpink" sur l'accueil
+  const fromPath = findColor(getPathSlug());
   const fromHash = findColor(window.location.hash.slice(1));
-  const initial =
-    fromPath ||
-    fromHash ||
-    colorsWithHsl.find((c) => c.name === "hotpink");
-  if (initial) {
-    selectColor(initial, { updateHistory: false });
-    // Ancien format #red : on bascule vers /red/
-    if (!fromPath && fromHash) {
-      window.history.replaceState({}, "", colorPath(initial));
-    }
+  const filterKey = fromPath ? null : findFilterBySlug(getPathSlug());
+
+  if (!fromPath && fromHash) {
+    window.history.replaceState({}, "", colorPath(fromHash));
+  }
+
+  if (filterKey) {
+    currentColor = getDefaultColor();
+    showFilter(filterKey, { updateHistory: false });
+  } else {
+    selectColor(fromPath || fromHash || getDefaultColor(), {
+      updateHistory: false,
+    });
   }
 
   // Initialize quiz
@@ -147,9 +114,41 @@ function init() {
     .addEventListener("click", () => quiz.open());
 }
 
-/** Nom de couleur lu dans l'URL : /red/ → "red" */
-function getPathColorName() {
+/** Premier segment de l'URL : /red/ → "red" */
+function getPathSlug() {
   return decodeURIComponent(window.location.pathname.split("/")[1] || "");
+}
+
+function getDefaultColor() {
+  return colorsWithHsl.find((c) => c.name === "hotpink");
+}
+
+/**
+ * Remplace le nom de balise d'un élément en conservant attributs et contenu
+ * (ex. h1 ↔ h2 ↔ p), pour garder un seul h1 pertinent par page.
+ */
+function swapTag(el, tag) {
+  if (!el || el.localName === tag) return el;
+  const next = document.createElement(tag);
+  [...el.attributes].forEach((attr) => next.setAttribute(attr.name, attr.value));
+  next.append(...el.childNodes);
+  el.replaceWith(next);
+  return next;
+}
+
+/**
+ * Le h1 dépend de la page : « Hotpink » sur l'accueil, le nom de la couleur
+ * sur /red/, le titre du filtre sur /couleurs-pastel/.
+ */
+function setPageMode(mode) {
+  pageMode = mode;
+  swapTag(document.querySelector(".brand-title"), mode === "home" ? "h1" : "p");
+  resultsTitle = swapTag(resultsTitle, mode === "filter" ? "h1" : "h2");
+  selectedColorDisplay.hidden = mode === "filter";
+  // Évite un second h1 dans la fiche couleur (masquée ou plus à la une)
+  if (mode !== "color") {
+    swapTag(selectedColorDisplay.querySelector("h1"), "h2");
+  }
 }
 
 function findColor(name) {
@@ -197,8 +196,13 @@ function setupEventListeners() {
 
   // Handle browser back/forward navigation
   window.addEventListener("popstate", () => {
-    const color = findColor(getPathColorName());
-    if (color) selectColor(color, { updateHistory: false });
+    const color = findColor(getPathSlug());
+    const filterKey = color ? null : findFilterBySlug(getPathSlug());
+    if (filterKey) {
+      showFilter(filterKey, { updateHistory: false });
+    } else {
+      selectColor(color || getDefaultColor(), { updateHistory: false });
+    }
   });
 }
 
@@ -392,37 +396,51 @@ function handleSpecialFilter(chip) {
   const filterType = chip.dataset.filter;
   const wasActive = chip.getAttribute("aria-pressed") === "true";
 
+  // Second click on the active chip: back to a color page
+  if (wasActive) {
+    searchInput.value = "";
+    closeSuggestions();
+    selectColor(currentColor || getDefaultColor());
+    return;
+  }
+
+  showFilter(filterType);
+}
+
+function showFilter(filterType, { updateHistory = true } = {}) {
+  const filterFn = filterFunctions[filterType];
+  if (!filterFn) return;
+
   resetFilters();
   searchInput.value = "";
   closeSuggestions();
 
-  // Second click on the active chip: back to nearby colors
-  if (wasActive) {
-    if (currentColor) selectColor(currentColor, { updateHistory: false });
-    return;
-  }
-
-  chip.setAttribute("aria-pressed", "true");
-
-  const filterFn = filterFunctions[filterType];
-  if (!filterFn) return;
+  filterChips.forEach((chip) => {
+    if (chip.dataset.filter === filterType) {
+      chip.setAttribute("aria-pressed", "true");
+    }
+  });
 
   // Sort by lightness (descending) for better aesthetics
-  const matches = filterFn(colorsWithHsl).sort((a, b) => b.hsl.l - a.hsl.l);
+  const matches = getFilterColors(filterType, colorsWithHsl);
 
-  document.title = `Hotpink - ${PAGE_TITLES[filterType] || "Filtre"}`;
+  // Les couleurs système n'ont pas de page dédiée
+  if (FILTER_SLUGS[filterType]) {
+    if (updateHistory && window.location.pathname !== filterPath(filterType)) {
+      window.history.pushState({}, "", filterPath(filterType));
+    }
+    setPageMode("filter");
+    document.title = filterPageTitle(filterType, matches.length);
+  } else {
+    document.title = `Hotpink - ${PAGE_TITLES[filterType] || "Filtre"}`;
+  }
+
   renderList({
-    title: `${FILTER_TITLES[filterType] || "Résultats du filtre"} (${pluralize(
-      matches.length
-    )})`,
-    description: FILTER_DESCRIPTIONS[filterType],
+    title: filterHeading(filterType, matches.length),
+    description: getFilterDescription(filterType),
     colors: matches,
     emptyText: "Aucune couleur trouvée pour ce filtre.",
   });
-}
-
-function pluralize(count) {
-  return `${count} couleur${count > 1 ? "s" : ""}`;
 }
 
 /* ----------------------------------
@@ -465,10 +483,11 @@ function createColorCard(color) {
 function selectColor(color, { updateHistory = true, scroll = false } = {}) {
   currentColor = color;
 
-  if (updateHistory && getPathColorName() !== color.name) {
+  if (updateHistory && getPathSlug() !== color.name) {
     window.history.pushState({}, "", colorPath(color));
   }
   document.title = colorTitle(color);
+  setPageMode(getPathSlug() === color.name ? "color" : "home");
 
   // Update slider position
   if (!color.system) {
@@ -490,7 +509,10 @@ function selectColor(color, { updateHistory = true, scroll = false } = {}) {
 
 function renderSelectedColor(color) {
   selectedColorDisplay.setAttribute("style", colorSheetStyle(color));
-  selectedColorDisplay.innerHTML = colorSheetHtml(color);
+  selectedColorDisplay.innerHTML = colorSheetHtml(
+    color,
+    pageMode === "color" ? "h1" : "h2"
+  );
 
   const favBtn = document.getElementById("toggle-fav-btn");
   updateFavButton(favBtn, color);

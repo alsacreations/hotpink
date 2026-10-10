@@ -9,6 +9,13 @@ import {
   hexToOklch,
 } from "./utils.js";
 import { getColorFunFact } from "./funfacts.js";
+import {
+  FILTER_DESCRIPTIONS,
+  FILTER_SLUGS,
+  FILTER_TITLES,
+  PAGE_TITLES,
+  filterFunctions,
+} from "./filters.js";
 
 export const SITE_NAME = "Hotpink";
 
@@ -19,6 +26,39 @@ export function colorPath(color) {
 
 export function colorTitle(color) {
   return `${color.name} (${color.hex.toUpperCase()}) : couleur CSS nommée | ${SITE_NAME}`;
+}
+
+export function pluralize(count) {
+  return `${count} couleur${count > 1 ? "s" : ""}`;
+}
+
+/* ----------------------------------
+ * Pages de filtres (/couleurs-pastel/…)
+ * ---------------------------------- */
+export function filterPath(key) {
+  return `/${FILTER_SLUGS[key]}/`;
+}
+
+/** Clé de filtre à partir d'un slug d'URL, sinon null */
+export function findFilterBySlug(slug) {
+  return Object.keys(FILTER_SLUGS).find((key) => FILTER_SLUGS[key] === slug) ?? null;
+}
+
+export function filterPageTitle(key, count) {
+  return `${PAGE_TITLES[key]} : ${count} couleurs CSS nommées | ${SITE_NAME}`;
+}
+
+export function filterHeading(key, count) {
+  return `${FILTER_TITLES[key]} (${pluralize(count)})`;
+}
+
+export function filterDescription(key) {
+  return FILTER_DESCRIPTIONS[key];
+}
+
+/** Couleurs d'un filtre, triées de la plus claire à la plus sombre */
+export function getFilterColors(key, colors) {
+  return filterFunctions[key](colors).sort((a, b) => b.hsl.l - a.hsl.l);
 }
 
 /** Ajoute la teinte/saturation/luminosité à une couleur non système */
@@ -119,7 +159,11 @@ export function colorSheetStyle(color) {
   return `--swatch: ${color.hex}; --on-swatch: ${getTextColor(color.value)}`;
 }
 
-export function colorSheetHtml(color) {
+/**
+ * @param {object} color
+ * @param {"h1"|"h2"} headingTag - h1 sur la page dédiée à la couleur
+ */
+export function colorSheetHtml(color, headingTag = "h2") {
   const hex = color.value;
   const rgb = hexToRgb(hex);
   const contrastBlack = getContrastRatio(hex, "#000000");
@@ -158,7 +202,7 @@ export function colorSheetHtml(color) {
         <button type="button" class="fav-btn" id="toggle-fav-btn"></button>
       </div>
       <div class="color-sheet-name" style="--name-len: ${color.name.length}">
-        <h2>${color.name}</h2>
+        <${headingTag}>${color.name}</${headingTag}>
         <span>${hex.toUpperCase()}</span>
       </div>
     </div>

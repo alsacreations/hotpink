@@ -798,6 +798,10 @@ main:focus,
 /* ----------------------------------
  * Fiche couleur
  * ---------------------------------- */
+.color-sheet[hidden] {
+  display: none;
+}
+
 .color-sheet {
   display: grid;
   overflow: hidden;
@@ -894,7 +898,7 @@ main:focus,
   flex-direction: column;
   gap: 10px;
 
-  & h2 {
+  & :is(h1, h2) {
     margin: 0;
     font-size: min(6.5rem, calc(95cqi / (var(--name-len, 7) * 0.62)));
     font-weight: var(--font-weight-extrabold);
@@ -1397,6 +1401,24 @@ main:focus,
   max-width: var(--container);
   margin-inline: auto;
   gap: var(--spacing-32);
+}
+
+.footer-nav {
+  flex-basis: 100%;
+
+  & ul {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    gap: var(--spacing-8) var(--spacing-24);
+    list-style: none;
+  }
+
+  & a {
+    color: var(--ink);
+    font-weight: var(--font-weight-semibold);
+  }
 }
 
 .footer-credits {

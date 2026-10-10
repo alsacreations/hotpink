@@ -22,6 +22,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - name: Installe les dépendances
+        run: npm ci
       - name: Génère le site (pages statiques par couleur)
         run: npm run build
       - uses: actions/upload-pages-artifact@v3
