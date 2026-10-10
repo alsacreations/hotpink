@@ -1427,6 +1427,14 @@ main:focus,
     height: auto;
     fill: currentcolor;
   }
+
+  & .logo-alsacreations-pepins-outer {
+    fill: #abc737;
+  }
+
+  & .logo-alsacreations-pepins-inner {
+    fill: var(--ink);
+  }
 }
 
 .btn-github {

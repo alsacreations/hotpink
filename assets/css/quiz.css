@@ -253,6 +253,23 @@
     gap: var(--spacing-16) var(--spacing-20);
   }
 
+  .quiz-counters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+    gap: var(--spacing-12) var(--spacing-20);
+  }
+
+  .quiz-question-count {
+    font-size: clamp(var(--text-16), 1rem + 0.2vw, 1.1875rem);
+    font-weight: var(--font-weight-semibold);
+
+    & strong {
+      font-weight: var(--font-weight-extrabold);
+    }
+  }
+
   .quiz-pill {
     padding: 8px 18px;
     border: 2.5px solid var(--ink);

@@ -479,10 +479,10 @@ function selectColor(color, { updateHistory = true, scroll = false } = {}) {
 }
 
 function getLevel(ratio) {
-  if (ratio >= 7) return "AAA";
+  if (ratio >= 7) return "Contraste OK AAA";
   if (ratio >= 4.5) return "AA";
   if (ratio >= 3) return "AA grand texte";
-  return "Insuffisant";
+  return "Contraste insuffisant";
 }
 
 function formatRatio(ratio) {
