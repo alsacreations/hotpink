@@ -131,7 +131,7 @@ export const specificFunFacts = {
   mintcream:
     "<strong>Mintcream</strong> est une couleur nommée qui évoque la légèreté de la menthe combinée à la douceur de la crème. C'est le plus clair de tous les verts dans la liste des couleurs nommées, un blanc cassé avec une nuance de vert très subtile.",
   gainsboro:
-    "<strong>Gainsboro</strong> est une couleur nommée qui tire son nom de la marque de crayons de couleur et de fournitures artistiques Gainsborough (un hommage implicite au portraitiste anglais Thomas Gainsborough).",
+    "<strong>Gainsboro</strong> doit son nom à la ville de Gainsborough, réputée au XIXe siècle pour ses tanneries et sa production textile, notamment une toile de lin ou de chanvre brut, gris clair naturel et non teintée. Cette teinte a fini par être désignée sous le nom de « Gainsborough gray » (gris Gainsborough).",
   peachpuff:
     "<strong>Peachpuff</strong> est une couleur nommée qui dérive de la teinte de la poudre pour le visage ou du fard à joues populaire dans le passé. Elle ne fait donc pas référence au fruit de la pêche, bien qu'elle en soit proche. Le nom provient d'un nuancier de peinture de la marque américaine Sinclair Paints, utilisé par les développeurs du système X11 dans les années 80 pour enrichir la liste.",
   thistle:
@@ -171,6 +171,63 @@ export const specificFunFacts = {
     "<strong>Lemonchiffon</strong> est une couleur nommée qui évoque la teinte d'un tissu de coton légèrement pâle et légèrement jaune. Le nom provient d'un nuancier de peinture de la marque américaine Sinclair Paints, utilisé par les développeurs du système X11 dans les années 80 pour enrichir la liste. À noter que la couleur <code>lemon</code> seule n'existe pas en CSS.",
   whitesmoke:
     "<strong>Whitesmoke</strong> n'est pas tout à fait blanc. Son nom fait référence à la couleur de la fumée de combustion propre ou de la vapeur, un blanc très légèrement grisé, utilisé historiquement pour distinguer les types de fumées industrielles.",
+
+  // Anecdotes ajoutées : chacune a été vérifiée (Wikipédia : Web colors,
+  // X11 color names, Khaki, Navy blue, Aquamarine, Steel blue) ou se déduit
+  // des valeurs de la couleur (contrastes calculés avec utils.js).
+  aquamarine:
+    "<strong>Aquamarine</strong> est nommée d'après la pierre précieuse du même nom (l'aigue-marine). Son premier emploi recensé comme nom de couleur en anglais remonte à 1598.",
+  blanchedalmond:
+    "<strong>Blanchedalmond</strong> signifie « amande blanchie » : une amande dont on a retiré la peau après l'avoir ébouillantée.",
+  blue: "<strong>Blue</strong> pur (<code>#0000ff</code>) offre un excellent contraste avec du texte blanc (8,59:1) mais un contraste insuffisant avec du texte noir (2,44:1).",
+  darkblue:
+    "<strong>Darkblue</strong> (<code>#00008b</code>) ne se distingue de <code>navy</code> (<code>#000080</code>) que par son canal bleu : 139 au lieu de 128.",
+  darkcyan:
+    "<strong>Darkcyan</strong> (<code>#008b8b</code>) ne se distingue de <code>teal</code> (<code>#008080</code>) que par ses canaux vert et bleu : 139 au lieu de 128.",
+  darkkhaki:
+    "<strong>Darkkhaki</strong> est une déclinaison de <code>khaki</code>, mot hindoustani signifiant « couleur de terre » (du persan <em>khāk</em>, « sol, poussière »). Le Corps of Guides, levé en 1846 dans l'armée britannique des Indes, est considéré comme la première unité militaire à avoir porté du khaki.",
+  darkmagenta:
+    "<strong>Darkmagenta</strong> (<code>#8b008b</code>) ne se distingue de <code>purple</code> (<code>#800080</code>) que par ses canaux rouge et bleu : 139 au lieu de 128.",
+  darkorange:
+    "<strong>Darkorange</strong> fait partie des noms X11 ajoutés en CSS 3, alors que <code>orange</code> avait été introduite plus tôt, en CSS 2.1, comme 17e couleur après les 16 couleurs HTML 4.",
+  darkred:
+    "<strong>Darkred</strong> (<code>#8b0000</code>) ne se distingue de <code>maroon</code> (<code>#800000</code>) que par son canal rouge : 139 au lieu de 128.",
+  lightgray:
+    "<strong>Lightgray</strong> (<code>#d3d3d3</code>) est plus claire que <code>silver</code> (<code>#c0c0c0</code>). Comme pour <code>gray</code>, l'orthographe <code>lightgrey</code> est acceptée en synonyme.",
+  lightgrey:
+    "<strong>Lightgrey</strong> (<code>#d3d3d3</code>) est plus claire que <code>silver</code> (<code>#c0c0c0</code>). Comme pour <code>grey</code>, c'est un synonyme de la forme américaine <code>lightgray</code>.",
+  navy: "<strong>Navy</strong> doit son nom au bleu foncé des uniformes d'officiers de la Royal Navy, dont le règlement date de 1748. Ce bleu s'appelait d'abord « marine blue » ; la presse britannique parlait de « navy blue » dès 1780 au plus tard.",
+  purple:
+    "<strong>Purple</strong> est piégeuse : en CSS elle vaut <code>#800080</code>, alors que dans la liste X11 d'origine, elle vaut <code>#a020f0</code>, un violet bien plus vif. Le web a gardé la valeur de HTML 4.",
+  slategray:
+    "<strong>Slategray</strong> est nommée d'après l'ardoise, cette roche métamorphique très utilisée en maçonnerie et en toiture, dont elle représente la teinte moyenne. Le nom « slate gray » est attesté en anglais dès 1705.",
+  slategrey:
+    "<strong>Slategrey</strong> est nommée d'après l'ardoise, cette roche métamorphique très utilisée en maçonnerie et en toiture, dont elle représente la teinte moyenne. C'est la variante orthographique de <code>slategray</code>, dont le nom est attesté en anglais dès 1705.",
+  lightslategray:
+    "<strong>Lightslategray</strong> est une version plus claire de <code>slategray</code>, nommée d'après la teinte de l'ardoise, cette roche métamorphique utilisée en maçonnerie et en toiture.",
+  lightslategrey:
+    "<strong>Lightslategrey</strong> est la variante orthographique de <code>lightslategray</code>, une version plus claire de <code>slategray</code>, nommée d'après la teinte de l'ardoise.",
+  slateblue:
+    "<strong>Slateblue</strong> est nommée d'après l'ardoise (<em>slate</em>), la roche dont la teinte gris-bleu a aussi donné <code>slategray</code>.",
+  darkslateblue:
+    "<strong>Darkslateblue</strong> est nommée d'après l'ardoise (<em>slate</em>), la roche dont la teinte gris-bleu a aussi donné <code>slategray</code>.",
+  mediumslateblue:
+    "<strong>Mediumslateblue</strong> est nommée d'après l'ardoise (<em>slate</em>), la roche dont la teinte gris-bleu a aussi donné <code>slategray</code>.",
+  steelblue:
+    "<strong>Steelblue</strong> évoque l'acier bleui, un acier traité en surface pour le protéger de la rouille. Son premier emploi recensé comme nom de couleur en anglais date de 1817.",
+  yellow:
+    "<strong>Yellow</strong> pur (<code>#ffff00</code>) est presque illisible avec du texte blanc (contraste de 1,07:1) mais excellent avec du texte noir (19,56:1).",
+
+  // Pas d'anecdote vérifiable trouvée pour les couleurs suivantes (on ne les
+  // invente pas ; elles retombent sur le texte générique « CSS 3 ») :
+  // blueviolet, darkgoldenrod, darkolivegreen, darkorchid, darksalmon,
+  // darkseagreen, darkturquoise, darkviolet, deepskyblue, forestgreen,
+  // greenyellow, lightblue, lightcoral, lightcyan, lightgreen, lightpink,
+  // lightsalmon, lightseagreen, lightskyblue, lightsteelblue, lightyellow,
+  // limegreen, mediumaquamarine, mediumorchid, mediumpurple, mediumseagreen,
+  // mediumturquoise, mediumvioletred, orangered,
+  // palegoldenrod, palegreen, paleturquoise, palevioletred, rosybrown,
+  // sandybrown, seagreen, yellowgreen.
 };
 
 // Historical colors from HTML 4.01 (1999)
