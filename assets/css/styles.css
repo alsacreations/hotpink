@@ -321,7 +321,7 @@ main:focus,
 .brand-badge {
   position: absolute;
   top: clamp(-58px, -5vw, -36px);
-  right: clamp(-30px, -2vw, -12px);
+  right: clamp(-70px, -5vw, -40px);
   width: clamp(92px, 10.5vw, 156px);
   height: clamp(92px, 10.5vw, 156px);
   margin: 0;
@@ -1050,7 +1050,6 @@ main:focus,
 }
 
 .filter-description {
-  max-width: 60ch;
   margin: 0;
   padding: 8px 18px;
   border: 2.5px solid var(--ink);
@@ -1244,59 +1243,6 @@ main:focus,
 /* ----------------------------------
  * Palettes
  * ---------------------------------- */
-.palettes-details {
-  border: 0;
-  background: transparent;
-
-  &:hover {
-    border: 0;
-  }
-}
-
-.palettes-summary {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: fit-content;
-  padding: 0;
-  gap: 18px;
-  list-style: none;
-  cursor: pointer;
-
-  &::-webkit-details-marker {
-    display: none;
-  }
-
-  &::after {
-    display: none;
-  }
-
-  & .section-title {
-    font-weight: var(--font-weight-extrabold);
-  }
-}
-
-.palettes-toggle {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  transition: transform 0.35s var(--ease-bounce);
-  border: var(--sticker-border);
-  border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 4px 4px 0 var(--ink);
-  font-size: var(--text-28);
-  font-weight: var(--font-weight-bold);
-  line-height: 1;
-
-  [open] > summary & {
-    transform: rotate(45deg);
-  }
-}
-
 .grid-palettes {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
@@ -1403,29 +1349,11 @@ main:focus,
   gap: var(--spacing-32);
 }
 
-.footer-nav {
-  flex-basis: 100%;
-
-  & ul {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0;
-    gap: var(--spacing-8) var(--spacing-24);
-    list-style: none;
-  }
-
-  & a {
-    color: var(--ink);
-    font-weight: var(--font-weight-semibold);
-  }
-}
-
 .footer-credits {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 22px;
+  align-items: baseline;
+  gap: 0.75rem;
 
   & p {
     margin: 0;
@@ -1446,8 +1374,9 @@ main:focus,
 
   & svg {
     display: block;
+    width: auto;
     max-width: 100%;
-    height: auto;
+    height: 1.5rem;
     fill: currentcolor;
   }
 

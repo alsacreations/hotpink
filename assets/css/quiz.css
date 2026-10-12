@@ -50,6 +50,11 @@
     }
   }
 
+  /* Pendant le jeu, les décorations sont figées */
+  .quiz-dialog.is-playing .quiz-deco {
+    animation-play-state: paused;
+  }
+
   .quiz-deco-dot {
     --r: -8deg;
     --duration: 6s;

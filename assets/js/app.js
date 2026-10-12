@@ -217,12 +217,15 @@ function renderMarquee() {
     )
     .join("");
   marqueeTrack.innerHTML = items;
-  stopMarqueeSmoothly();
+  stopAnimationSmoothly(marqueeTrack);
+  document
+    .querySelectorAll(".floating-sticker")
+    .forEach((sticker) => stopAnimationSmoothly(sticker));
 }
 
-/* Ralentit puis arrête le défilement après 3 secondes (WCAG 2.2.2) */
-function stopMarqueeSmoothly(delay = 3000, duration = 1500) {
-  const animation = marqueeTrack.getAnimations()[0];
+/* Ralentit puis arrête une animation après 3 secondes (WCAG 2.2.2) */
+function stopAnimationSmoothly(element, delay = 3000, duration = 1500) {
+  const animation = element.getAnimations()[0];
   if (!animation) return;
 
   setTimeout(() => {
@@ -367,6 +370,8 @@ function handleHueSlider(e) {
   resetFilters();
   searchInput.value = "";
   closeSuggestions();
+  // La fiche masquée laisse la liste filtrée visible sans défilement
+  selectedColorDisplay.hidden = true;
 
   const hue = parseInt(e.target.value, 10);
   hueSlider.style.setProperty("--hue-color", `hsl(${hue} 95% 60%)`);

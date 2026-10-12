@@ -71,6 +71,7 @@ export class ColorQuiz {
     this.startScreen.hidden = screen !== "start";
     this.gameScreen.hidden = screen !== "game";
     this.resultsScreen.hidden = screen !== "results";
+    this.dialog.classList.toggle("is-playing", screen === "game");
   }
 
   startGame() {
